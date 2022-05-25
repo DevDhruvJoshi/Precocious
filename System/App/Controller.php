@@ -1,6 +1,6 @@
 <?php
-
-class Controller extends DMVC {
+use DhruvJoshi\Precocious;
+class Controller extends Precocious{
 
     public function __construct() {
         dd('call ' . __CLASS__ . ' Fun ' . __FUNCTION__);

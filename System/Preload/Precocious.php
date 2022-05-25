@@ -1,5 +1,5 @@
 <?php
-namespace DhruvJoshi\Precocious;
+namespace DhruvJoshi;
 class Precocious {
 
     public function __construct($URL = '') {

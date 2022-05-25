@@ -46,7 +46,8 @@ spl_autoload_register(function ($ClassName) {
   require_once ($F);
   /* */
 echo '<pre>';
-(new DMVC())->Run();
+use DhruvJoshi\Precocious;
+(new Precocious())->Run();
 /* /
 
   if ($url == '/') {
