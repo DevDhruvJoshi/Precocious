@@ -1,0 +1,14 @@
+{
+    "name": "dhruvjoshi/precocious",
+    "description": "Easy and smart to craete fast your project",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dhruv Joshi",
+            "email": "mail@DhruvJoshi.Dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
