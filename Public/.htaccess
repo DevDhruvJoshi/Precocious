@@ -1,6 +1,8 @@
 RewriteEngine On
 
+php_value display_errors On
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-RewriteRule ^(.+)$ Public/index.php/$1 [L]
+RewriteRule ^(.+)$ index.php/$1 [L]

@@ -1,6 +1,6 @@
 {
     "name": "dhruvjoshi/precocious",
-    "description": "Easy & smart to craete fast your project https://github.com/DevDhruvJoshi/Precocious.git https://packagist.org/packages/dhruvjoshi/precocious",
+    "description": "Easy & smart to create fast your project https://github.com/DevDhruvJoshi/Precocious.git https://packagist.org/packages/dhruvjoshi/precocious",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -14,6 +14,16 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
+    "autoload": {
+        "files": 
+                ["System/Init.php"],
+        "psr-4": {
+            "System\\Init\\" : "System/",
+            "App\\": "App/"
+        }
+    },
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "symfony/dotenv": "^7.1"
+    }
 }

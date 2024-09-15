@@ -1,117 +1,70 @@
 <?php
 
-define('AppStartTime', microtime(true));
-define('DS', '/');
-define('Root', str_replace('\\', '/', dirname(__FILE__) . DS) . '..' . DS);
-define('System', Root . 'System' . DS);
-define('Globals', System . 'Globals' . DS);
-define('Library', System . 'Library' . DS);
-define('Preload', System . 'Preload' . DS);
-define('Includes', System . 'Includes' . DS);
-define('App', Root . 'App' . DS);
-set_include_path($IncludePath = (Includes . PATH_SEPARATOR . get_include_path())); //  Why ??????????
+namespace System;
 
-
-/* *
-  $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-  $dotenv->load();
-
-  require_once realpath(__DIR__ . '/vendor/autoload.php');
-  /* */
-
-foreach (glob(Globals . '*.php') as $F)
-    require ($F);
-foreach (glob(Preload . '*.php') as $F)
-    require ($F);
-
-foreach (glob(System . 'App' . DS . '*.php') as $F)
-    require_once ($F);
-spl_autoload_register(function ($ClassName) {
-    if (!empty($ClassName)) {
-        if (file_exists(Library . $ClassName . '.php'))
-            require (Library . $ClassName . '.php');
-
-        if (file_exists(App . 'Models' . DS . $ClassName . '.php'))
-            require (App . 'Models' . DS . $ClassName . '.php');
-    }
-});
-
-/* *
-  foreach (glob(Library . '*.php') as $F)
-  require ($F);
-
-  foreach (glob(System . 'App' . DS . '*.php') as $F)
-  require_once ($F);
-  foreach (glob(App . 'Models' . DS . '*.php') as $F)
-  require_once ($F);
-  /* */
-echo '<pre>';
 use DhruvJoshi\Precocious;
-(new Precocious())->Run();
-/* /
+use Symfony\Component\Dotenv\Dotenv;
+use System\App\Tenant;
 
-  if ($url == '/') {
+class Init {
 
-  // This is the home page
-  // Initiate the home controller
-  // and render the home view
+    function __construct() {
 
-  require_once App . 'Models/index_model.php';
-  require_once App . 'Controllers/index.php';
-  require_once App . 'Views/index_view.php';
+        define('AppStartTime', microtime(true));
 
-  $indexModel = New IndexModel();
-  $indexController = New IndexController($indexModel);
-  $indexView = New IndexView($indexController, $indexModel);
+        define('DS', '/');
+        define('Root', str_replace('\\', '/', dirname(__FILE__) . DS) . '..' . DS);
+        define('System', Root . 'System' . DS);
+        define('Config', System . 'Config' . DS);
+        define('Globals', System . 'Globals' . DS);
+        define('Library', System . 'Library' . DS);
+        define('Preload', System . 'Preload' . DS);
+        define('Includes', System . 'Includes' . DS);
+        define('App', Root . 'App' . DS);
+        define('TenantBaseDir', Root . '..' . DS . 'Tenant' . DS);
+        set_include_path($IncludePath = (Includes . PATH_SEPARATOR . get_include_path())); //  Why ??????????
 
-  print $indexView->index();
-  } else {
 
-  // This is not home page
-  // Initiate the appropriate controller
-  // and render the required view
-  //The first element should be a controller
-  $requestedController = $url[0];
 
-  // If a second part is added in the URI,
-  // it should be a method
-  $requestedAction = isset($url[1]) ? $url[1] : '';
 
-  // The remain parts are considered as
-  // arguments of the method
-  $requestedParams = array_slice($url, 2);
+        $dotenv = new Dotenv();
+        $dotenv->load(Root . '/.env');
 
-  // Check if controller exists. NB:
-  // You have to do that for the model and the view too
-  $ctrlPath = App . 'Controllers/' . $requestedController . '.php';
+        foreach (array_merge(
+                glob(Globals . '*.php'),
+                glob(Preload . '*.php'),
+                glob(Config . '*.php'),
+                glob(System . 'App' . DS . 'Trait' . DS . '*.php'),
+                glob(System . 'App' . DS . 'Session' . DS . '*.php'),
+                glob(System . 'App' . DS . 'Tenant' . DS . '*.php'),
+                glob(System . 'App' . DS . '*.php'),
+        ) As $F)
+            require ($F);
 
-  if (file_exists($ctrlPath)) {
-  new DMVC();
-  /* require_once App . 'Models/' . $requestedController . '_model.php';
-  require_once App . 'Controllers/' . $requestedController . '.php';
-  require_once App . 'Views/' . $requestedController . '_view.php';
 
-  $modelName = ucfirst($requestedController) . 'Model';
-  $controllerName = ucfirst($requestedController) . 'Controller';
-  $viewName = ucfirst($requestedController) . 'View';
+        $OldTraceID = isset($_COOKIE['TraceID']) ? $_COOKIE['TraceID'] : '0000000000000000';
+        define('OldTraceID', $OldTraceID); // Tracking ID Trace ID every hits (click)
+        define('TraceID', GenerateUniqueID(16)); // Tracking ID Trace ID every hits (click)
+        setcookie('TraceID', TraceID);
+        /*         * /
+          SELECT
+          CASE WHEN condition1 THEN TrackID AS NewTrackID ELSE TrackID AS OldTrackID END,
+          FROM your_table_name;
+          /* */
 
-  $controllerObj = new $controllerName(new $modelName);
-  $viewObj = new $viewName($controllerObj, new $modelName);
+        spl_autoload_register(function ($ClassName) {
+            if (!empty($ClassName)) {
+                if (file_exists(Library . $ClassName . '.php'))
+                    require (Library . $ClassName . '.php');
 
-  // If there is a method - Second parameter
-  if ($requestedAction != '') {
-  // then we call the method via the view
-  // dynamic call of the view
-  print $controllerObj->$requestedAction($requestedParams);
-  } */
-/*
-  } else {
-  
+                if (file_exists(App . 'Model' . DS . $ClassName . '.php'))
+                    require (App . 'Model' . DS . $ClassName . '.php');
+            }
+        });
 
-header('HTTP/1.1 404 Not Found');
-die('404 - The file - ' . $ctrlPath . ' - not found');
-//require the 404 controller and initiate it
-//Display its view
+        //dd(Precocious::Install(0));
+        (new Precocious())->Run();
+    }
 }
-}
-/**/
+
+new Init();

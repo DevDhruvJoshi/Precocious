@@ -6,13 +6,55 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitef17410c5350abc31eed98708c174fc4
 {
+    public static $files = array (
+        '437117a15e07e1ce868ad3872a22cd39' => __DIR__ . '/../..' . '/System/Init.php',
+    );
+
+    public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'System\\Init\\' => 12,
+            'Symfony\\Component\\Dotenv\\' => 25,
+        ),
+        'A' => 
+        array (
+            'App\\' => 4,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'System\\Init\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/System',
+        ),
+        'Symfony\\Component\\Dotenv\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/dotenv',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/App',
+        ),
+    );
+
     public static $classMap = array (
+        'App\\Controller\\AboutController' => __DIR__ . '/../..' . '/App/Controller/AboutController.php',
+        'App\\Model\\Contact' => __DIR__ . '/../..' . '/App/Model/Contact.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Symfony\\Component\\Dotenv\\Command\\DebugCommand' => __DIR__ . '/..' . '/symfony/dotenv/Command/DebugCommand.php',
+        'Symfony\\Component\\Dotenv\\Command\\DotenvDumpCommand' => __DIR__ . '/..' . '/symfony/dotenv/Command/DotenvDumpCommand.php',
+        'Symfony\\Component\\Dotenv\\Dotenv' => __DIR__ . '/..' . '/symfony/dotenv/Dotenv.php',
+        'Symfony\\Component\\Dotenv\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/dotenv/Exception/ExceptionInterface.php',
+        'Symfony\\Component\\Dotenv\\Exception\\FormatException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatException.php',
+        'Symfony\\Component\\Dotenv\\Exception\\FormatExceptionContext' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatExceptionContext.php',
+        'Symfony\\Component\\Dotenv\\Exception\\PathException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/PathException.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInitef17410c5350abc31eed98708c174fc4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitef17410c5350abc31eed98708c174fc4::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInitef17410c5350abc31eed98708c174fc4::$classMap;
 
         }, null, ClassLoader::class);
