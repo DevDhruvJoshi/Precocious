@@ -25,6 +25,7 @@ return array(
     'System\\App\\Session' => $baseDir . '/System/App/Session.php',
     'System\\App\\Session\\DBBased' => $baseDir . '/System/App/Session/DBBased.php',
     'System\\App\\Tenant' => $baseDir . '/System/App/Tenant.php',
+    'System\\App\\Tenant\\Base' => $baseDir . '/System/App/Tenant/Base.php',
     'System\\App\\Trait\\UDFModel' => $baseDir . '/System/App/Trait/UDFModel.php',
     'System\\Domain' => $baseDir . '/System/Domain.php',
     'System\\Init' => $baseDir . '/System/Init.php',

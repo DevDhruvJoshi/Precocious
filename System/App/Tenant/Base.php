@@ -1,6 +1,6 @@
 <?php
 
-namespace System\App\Tenat;
+namespace System\App\Tenant;
 
 use System\Config\DB;
 use System\App\Trait\UDFModel;
