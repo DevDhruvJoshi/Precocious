@@ -15,12 +15,13 @@
         "sort-packages": true
     },
     "autoload": {
-        "files": 
-                ["System/Init.php"],
         "psr-4": {
-            "System\\" : "System/",
+            "System\\": "System/",
             "App\\": "App/"
-        }
+        },
+        "files": [
+            "System/Init.php"
+        ]
     },
     "minimum-stability": "stable",
     "require": {
