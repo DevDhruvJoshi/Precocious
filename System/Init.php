@@ -2,7 +2,7 @@
 
 namespace System;
 
-use DhruvJoshi\Precocious;
+use Preload\Precocious;
 use Symfony\Component\Dotenv\Dotenv;
 use System\App\Tenant;
 

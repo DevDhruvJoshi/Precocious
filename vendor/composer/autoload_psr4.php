@@ -6,7 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'System\\Init\\' => array($baseDir . '/System'),
+    'System\\' => array($baseDir . '/System'),
     'Symfony\\Component\\Dotenv\\' => array($vendorDir . '/symfony/dotenv'),
     'App\\' => array($baseDir . '/App'),
 );

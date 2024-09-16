@@ -18,7 +18,7 @@
         "files": 
                 ["System/Init.php"],
         "psr-4": {
-            "System\\Init\\" : "System/",
+            "System\\" : "System/",
             "App\\": "App/"
         }
     },

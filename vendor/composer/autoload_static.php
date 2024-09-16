@@ -13,7 +13,7 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'System\\Init\\' => 12,
+            'System\\' => 7,
             'Symfony\\Component\\Dotenv\\' => 25,
         ),
         'A' => 
@@ -23,7 +23,7 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
     );
 
     public static $prefixDirsPsr4 = array (
-        'System\\Init\\' => 
+        'System\\' => 
         array (
             0 => __DIR__ . '/../..' . '/System',
         ),
@@ -39,7 +39,9 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
 
     public static $classMap = array (
         'App\\Controller\\AboutController' => __DIR__ . '/../..' . '/App/Controller/AboutController.php',
+        'App\\Controller\\UserController' => __DIR__ . '/../..' . '/App/Controller/UserController.php',
         'App\\Model\\Contact' => __DIR__ . '/../..' . '/App/Model/Contact.php',
+        'App\\Model\\User' => __DIR__ . '/../..' . '/App/Model/User.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Symfony\\Component\\Dotenv\\Command\\DebugCommand' => __DIR__ . '/..' . '/symfony/dotenv/Command/DebugCommand.php',
         'Symfony\\Component\\Dotenv\\Command\\DotenvDumpCommand' => __DIR__ . '/..' . '/symfony/dotenv/Command/DotenvDumpCommand.php',
@@ -48,6 +50,17 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
         'Symfony\\Component\\Dotenv\\Exception\\FormatException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatException.php',
         'Symfony\\Component\\Dotenv\\Exception\\FormatExceptionContext' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatExceptionContext.php',
         'Symfony\\Component\\Dotenv\\Exception\\PathException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/PathException.php',
+        'System\\App\\Controller' => __DIR__ . '/../..' . '/System/App/Controller.php',
+        'System\\App\\Data' => __DIR__ . '/../..' . '/System/App/Data.php',
+        'System\\App\\Model' => __DIR__ . '/../..' . '/System/App/Model.php',
+        'System\\App\\Route' => __DIR__ . '/../..' . '/System/App/Route.php',
+        'System\\App\\Session' => __DIR__ . '/../..' . '/System/App/Session.php',
+        'System\\App\\Session\\DBBased' => __DIR__ . '/../..' . '/System/App/Session/DBBased.php',
+        'System\\App\\Tenant' => __DIR__ . '/../..' . '/System/App/Tenant.php',
+        'System\\App\\Trait\\UDFModel' => __DIR__ . '/../..' . '/System/App/Trait/UDFModel.php',
+        'System\\Domain' => __DIR__ . '/../..' . '/System/Domain.php',
+        'System\\Init' => __DIR__ . '/../..' . '/System/Init.php',
+        'System\\Preload\\Precocious' => __DIR__ . '/../..' . '/System/Preload/Precocious.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

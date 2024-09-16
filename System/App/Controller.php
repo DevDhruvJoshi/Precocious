@@ -2,7 +2,7 @@
 
 namespace System\App;
 
-use DhruvJoshi\Precocious;
+use System\Preload\Precocious;
 class Controller extends Precocious{
 
     public function __construct() {

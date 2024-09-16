@@ -1,6 +1,6 @@
 <?php
 
-namespace DhruvJoshi;
+namespace System\Preload;
 
 use SystemExc;
 use System\App\Tenant;
