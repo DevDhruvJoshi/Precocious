@@ -1,6 +1,6 @@
 <?php
 /*
- * 
+ * -------------Note--------
  * ------------------Note-----------------
  * 19-07-2024 
  * vertual host and rewrite is on but not redicting to /public /index.php file so temporary create this, so this is solution is pending
