@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'dhruvjoshi/precocious',
-        'pretty_version' => '1.0.0',
-        'version' => '1.0.0.0',
-        'reference' => '84872dfef97e195f04e13ecc111b57e3568a12c0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '6a61c028fce546a065237522a87a912faa27b1b6',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'dhruvjoshi/precocious' => array(
-            'pretty_version' => '1.0.0',
-            'version' => '1.0.0.0',
-            'reference' => '84872dfef97e195f04e13ecc111b57e3568a12c0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '6a61c028fce546a065237522a87a912faa27b1b6',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

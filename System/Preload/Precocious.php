@@ -31,6 +31,7 @@ class Precocious {
         $R = [];
         if ($ErrorCode == 11 || $ErrorCode === 0)
             $R['CreateTenantBaseDir'] = is_dir(TenantBaseDir) ?: mkdir(TenantBaseDir, 0777);
+            Tenant::Install(0, 0);
         foreach (Tenant::All() As $Tenant)
             Tenant::Install($Tenant['ID'], 0);
         return$R;
@@ -69,9 +70,10 @@ class Precocious {
             //exit('Multi-tenant system are unavailable for this Domain ');
             throw new SystemExc('Multi-tenant system are unavailable for this Domain ', 404);
         } elseif (Tenant::Permission() === false && empty(SubDomain())) {
+            $_SERVER['Tenant']['ID'] = 0;
+            $_SERVER['Tenant']['Name'] = 0;
             define(TenantID, 0);
         } else {
-            
         }
     }
 

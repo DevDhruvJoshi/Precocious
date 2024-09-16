@@ -27,6 +27,7 @@ return array(
     'System\\App\\Tenant' => $baseDir . '/System/App/Tenant.php',
     'System\\App\\Tenant\\Base' => $baseDir . '/System/App/Tenant/Base.php',
     'System\\App\\Trait\\UDFModel' => $baseDir . '/System/App/Trait/UDFModel.php',
+    'System\\Config\\DB' => $baseDir . '/System/Config/DB.php',
     'System\\Domain' => $baseDir . '/System/Domain.php',
     'System\\Init' => $baseDir . '/System/Init.php',
     'System\\Preload\\Precocious' => $baseDir . '/System/Preload/Precocious.php',

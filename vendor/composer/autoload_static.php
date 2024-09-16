@@ -59,6 +59,7 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
         'System\\App\\Tenant' => __DIR__ . '/../..' . '/System/App/Tenant.php',
         'System\\App\\Tenant\\Base' => __DIR__ . '/../..' . '/System/App/Tenant/Base.php',
         'System\\App\\Trait\\UDFModel' => __DIR__ . '/../..' . '/System/App/Trait/UDFModel.php',
+        'System\\Config\\DB' => __DIR__ . '/../..' . '/System/Config/DB.php',
         'System\\Domain' => __DIR__ . '/../..' . '/System/Domain.php',
         'System\\Init' => __DIR__ . '/../..' . '/System/Init.php',
         'System\\Preload\\Precocious' => __DIR__ . '/../..' . '/System/Preload/Precocious.php',

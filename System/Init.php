@@ -2,7 +2,7 @@
 
 namespace System;
 
-use Preload\Precocious;
+use System\Preload\Precocious;
 use Symfony\Component\Dotenv\Dotenv;
 use System\App\Tenant;
 
@@ -46,6 +46,8 @@ class Init {
         define('OldTraceID', $OldTraceID); // Tracking ID Trace ID every hits (click)
         define('TraceID', GenerateUniqueID(16)); // Tracking ID Trace ID every hits (click)
         setcookie('TraceID', TraceID);
+        $_SERVER['Tenant']['ID'] = 00;
+        $_SERVER['Tenant']['Name'] = 00;
         /*         * /
           SELECT
           CASE WHEN condition1 THEN TrackID AS NewTrackID ELSE TrackID AS OldTrackID END,

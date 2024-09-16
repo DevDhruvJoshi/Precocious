@@ -1,6 +1,7 @@
 <?php
 
 use System\App\Route;
+use System\Preload\Precocious;
 
 Route::Get('/', function () {
     echo "This is the home route";
@@ -10,6 +11,11 @@ Route::Get('/', function () {
 Route::Get('/phpinfo', function () {
     phpinfo();
 });
+
+Route::Get('/install', function () {
+    Precocious::Install();
+});
+
 Route::Get('/dbunittest', function () {
     $db = new \System\Config\DB();
 /* * /

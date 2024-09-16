@@ -2,7 +2,7 @@
 
 namespace System\App;
 
-class Tenant extends \System\App\Tenat\Base {
+class Tenant extends \System\App\Tenant\Base {
 
 //class Tenant extends \System\Config\DB{
 

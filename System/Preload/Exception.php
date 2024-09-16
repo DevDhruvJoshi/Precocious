@@ -98,7 +98,7 @@ function GlobalExceptionInit(Throwable $E) {
 
 function SaveErrorLogFile($E, $EClassName = null) {
     //error_log($Msg, E_ERROR, $ErrorFile, 2); // issue with SMTP is reuired
-    $Msg = ('TID-' . TraceID . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
+    $Msg = ('TID-' . (( TraceID !== null ) ? TraceID: '') . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
     $ErrorFile = ( TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/' . date('Y-m-d')) . '.log';
 //is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
     file_exists($ErrorFile) ?: touch($ErrorFile);
@@ -110,7 +110,7 @@ function SaveAccessLogFile($Browser) {
     $C = Client();
     $Msg = ('TID-' . TraceID . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] Req-' . $_SERVER['REQUEST_METHOD'] . ' URI ' . $_SERVER['REQUEST_URI'] . ' IP-' . $C['IP'] . ' ' . $C['Browser'] . '#' . $C['Version'] . ' ' . $C['Platform'] . '#' . $C['PlatformVersion'] . '-' . $C['Bitness']) . '||';
     $ErrorFile = ( TenantBaseDir . $_SERVER['Tenant']['ID'] . '/AccessLog/' . date('Y-m-d')) . '.log';
-//is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
+//is_dir($ErrorFile) ?: throw new SystemExc('AccessLog Directory is not found');
     file_exists($ErrorFile) ?: touch($ErrorFile);
     file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
 }
