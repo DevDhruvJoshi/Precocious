@@ -1,5 +1,5 @@
 <?php
-
+namespace System\App;
 class Cache {
 
     private $cacheBackend; // Variable to hold the cache backend instance

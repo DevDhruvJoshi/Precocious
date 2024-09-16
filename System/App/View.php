@@ -1,5 +1,6 @@
 <?php
 
+namespace   System\App;
 class View {
 
     protected $File = '';

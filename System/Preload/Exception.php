@@ -1,5 +1,6 @@
 <?php
 
+namespace System\Preload;
 /*
  * This is new Version of Exeption old is not capable for fetal error
  */

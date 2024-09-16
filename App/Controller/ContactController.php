@@ -1,5 +1,7 @@
 <?php
 
+use System\App\Controller;
+
 class ContactController extends Controller {
 
     public function Index($param = []) {

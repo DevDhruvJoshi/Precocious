@@ -1,5 +1,7 @@
 <?php
 
+use System\App\Controller;
+
 /**
  * The home page controller
  */

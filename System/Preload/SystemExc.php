@@ -1,5 +1,6 @@
 <?php
 
+namespace System\Preload;
 class SystemExc extends Exception {
     private $parameters;
     public static $Code;

@@ -1,5 +1,6 @@
 <?php
 
+namespace System\Preload;
 class DBExc extends PDOException {
 
     private $parameters;
@@ -34,7 +35,8 @@ class DBExc extends PDOException {
 
     public function Response($E) {
         SystemView('Exception/DB', [
-            'Code' => self::$Code,
+            'Code' => 
+            ,
             'Message' => self::$Message,
             'Trace' => self::$TraceString,
             'Query' => htmlspecialchars(self::$Query),
