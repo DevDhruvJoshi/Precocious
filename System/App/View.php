@@ -1,6 +1,9 @@
 <?php
 
-namespace   System\App;
+namespace System\App;
+
+use System\Preload\SystemExc;
+
 class View {
 
     protected $File = '';

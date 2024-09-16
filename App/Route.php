@@ -2,10 +2,11 @@
 
 use System\App\Route;
 use System\Preload\Precocious;
+use App\Model\Contact;
 
 Route::Get('/', function () {
     echo "This is the home route";
-    dd(App\Model\Contact::All([], ['ID' => 'desc'], false));
+    dd(Contact::All([], ['ID' => 'desc'], false));
 });
 
 Route::Get('/phpinfo', function () {
@@ -92,7 +93,7 @@ Route::Post('/loginnow', [App\Controller\UserController::class, 'Login']);
 Route::Get('/about/{ID}', [App\Controller\AboutController::class, 'index']);
 
 Route::Get('/cotactbyid/{ID}', function ($ID) {
-    dd(App\Model\Contact::ID($ID, '1 desc', false));
+    dd(App\Model\Contact::ID($ID, ['*']));
 });
 Route::Any('/directview', function () {
     return View('Contact');

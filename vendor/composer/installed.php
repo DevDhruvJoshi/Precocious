@@ -3,7 +3,7 @@
         'name' => 'dhruvjoshi/precocious',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '6a61c028fce546a065237522a87a912faa27b1b6',
+        'reference' => '27731ec4fef8a0374728c7e357ad754e0e5c6ce1',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'dhruvjoshi/precocious' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '6a61c028fce546a065237522a87a912faa27b1b6',
+            'reference' => '27731ec4fef8a0374728c7e357ad754e0e5c6ce1',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

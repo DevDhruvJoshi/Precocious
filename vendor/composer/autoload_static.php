@@ -50,6 +50,7 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
         'Symfony\\Component\\Dotenv\\Exception\\FormatException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatException.php',
         'Symfony\\Component\\Dotenv\\Exception\\FormatExceptionContext' => __DIR__ . '/..' . '/symfony/dotenv/Exception/FormatExceptionContext.php',
         'Symfony\\Component\\Dotenv\\Exception\\PathException' => __DIR__ . '/..' . '/symfony/dotenv/Exception/PathException.php',
+        'System\\App\\Cache' => __DIR__ . '/../..' . '/System/App/Cache.php',
         'System\\App\\Controller' => __DIR__ . '/../..' . '/System/App/Controller.php',
         'System\\App\\Data' => __DIR__ . '/../..' . '/System/App/Data.php',
         'System\\App\\Model' => __DIR__ . '/../..' . '/System/App/Model.php',
@@ -59,10 +60,14 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
         'System\\App\\Tenant' => __DIR__ . '/../..' . '/System/App/Tenant.php',
         'System\\App\\Tenant\\Base' => __DIR__ . '/../..' . '/System/App/Tenant/Base.php',
         'System\\App\\Trait\\UDFModel' => __DIR__ . '/../..' . '/System/App/Trait/UDFModel.php',
+        'System\\App\\View' => __DIR__ . '/../..' . '/System/App/View.php',
         'System\\Config\\DB' => __DIR__ . '/../..' . '/System/Config/DB.php',
         'System\\Domain' => __DIR__ . '/../..' . '/System/Domain.php',
         'System\\Init' => __DIR__ . '/../..' . '/System/Init.php',
+        'System\\Preload\\DBExc' => __DIR__ . '/../..' . '/System/Preload/DBExc.php',
+        'System\\Preload\\Exc' => __DIR__ . '/../..' . '/System/Preload/Exc.php',
         'System\\Preload\\Precocious' => __DIR__ . '/../..' . '/System/Preload/Precocious.php',
+        'System\\Preload\\SystemExc' => __DIR__ . '/../..' . '/System/Preload/SystemExc.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

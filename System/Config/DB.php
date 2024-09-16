@@ -3,7 +3,10 @@
 namespace System\Config;
 
 use PDO;
+use PDOException;
 use \System\App\Tenant;
+use System\Preload\DBExc;
+use System\Preload\SystemExc;
 
 
 class DB {
@@ -45,7 +48,7 @@ class DB {
                 $this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } else
-                throw new \SystemExc("Unsupported database type: " . $this->Type);
+                throw new SystemExc("Unsupported database type: " . $this->Type);
         } catch (PDOException $E) {
             //throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
@@ -65,7 +68,7 @@ class DB {
             $stmt->execute();
             return $this->Connection->lastInsertId(); // Return the inserted ID (if applicable)
         } catch (PDOException $e) {
-            throw new \DBExc("Insert error: " . $e->getMessage());
+            throw new DBExc("Insert error: " . $e->getMessage());
         }
     }
 

@@ -4,6 +4,9 @@
  * This is new Version of Exeption old is not capable for fetal error
  */
 namespace System\Preload;
+
+use Exception;
+
 class Exc extends Exception {
 
     function __construct($message, $code = 0, Exception $PE = null) {
