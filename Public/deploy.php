@@ -1,3 +1,4 @@
+<h2>app.dhruvjoshi.dev server</h2>
 <?php
 
 // Your secret token from GitHub Webhook setup
