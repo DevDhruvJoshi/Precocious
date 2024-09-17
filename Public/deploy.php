@@ -12,7 +12,7 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
         http_response_code(403);
         exit;
     } else {
-            }}{        // Path to the deploy script
+            }}{ {       // Path to the deploy script
         $scriptPath = '/home/ubuntu/deploy.sh';
 
         // Execute the deploy script and capture output
