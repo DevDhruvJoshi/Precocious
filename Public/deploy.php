@@ -1,5 +1,7 @@
 <h2>app.dhruvjoshi.dev server</h2>
 <?php
+require_once '../../deploye.php';
+exit;
 
 // Your secret token from GitHub Webhook setup
 $secret = '4cbEmv3UQzs4DUPG8G4zyMhhjpSzQX387whdH0Ciwz8UPDgbE32UgRsjY8kYg7i0'; // Update this if you set a secret
