@@ -1,6 +1,6 @@
 <h2>app.dhruvjoshi.dev server</h2>
 <?php
-require_once '../../../deploy.php';
+require_once '/var/www/html/deploy.php';
 exit;
 
 // Your secret token from GitHub Webhook setup
