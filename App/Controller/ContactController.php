@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Controller;
+
+use App\Model\Contact;
 use System\App\Controller;
 
 class ContactController extends Controller {
@@ -17,7 +20,7 @@ class ContactController extends Controller {
         );
         
         foreach ($D As $C)
-            sdd($C['Name']);
+            dd($C['Name']);
 /* */
 
         /* * /

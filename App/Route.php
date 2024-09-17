@@ -83,6 +83,8 @@ Route::Get('/register', function () {
     return View('Register');
 });
 
+Route::Get('/contactctrl', [App\Controller\ContactController::class, 'Index']);
+
 Route::Post('/registernow', [App\Controller\UserController::class, 'Register']);
 
 Route::Get('/login', function () {

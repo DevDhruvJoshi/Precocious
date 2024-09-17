@@ -2,7 +2,8 @@
 
 namespace System\App;
 
-use Exc;
+use System\Preload\Exc;
+use System\Preload\SystemExc;
 
 final class Route {
 
@@ -41,14 +42,14 @@ final class Route {
                     if ($controller) {
                         
                     } else {
-                        throw new Exc("Controller class '" . $CallBack[0] . "' not found");
+                        throw new SystemExc("Controller class '" . $CallBack[0] . "' not found");
                     }
                 }
             } else {
-                throw new Exc("Method '$method' not allowed for '$uri'");
+                throw new SystemExc("Method '$method' not allowed for '$uri'");
             }
         } else {
-            throw new Exc("Route '$uri' not found");
+            throw new SystemExc("Route '$uri' not found");
         }
     }
 
