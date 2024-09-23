@@ -19,6 +19,9 @@
             "System\\": "System/",
             "App\\": "App/"
         },
+        "classmap": [
+            "System/View/"
+        ],
         "files": [
             "System/Init.php"
         ]
