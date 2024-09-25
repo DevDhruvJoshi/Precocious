@@ -1,7 +1,3 @@
-<h2>app.dhruvjoshi.dev server</h2>
-
-
-
 <?php
 // Your secret token from GitHub Webhook setup
 $secret = '4cbEmv3UQzs4DUPG8G4zyMhhjpSzQX387whdH0Ciwz8UPDgbE32UgRsjY8kYg7i0'; // Update this if you set a secret
@@ -15,10 +11,7 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
         exit;
     } else {
 
-
-
-
-
+        echo 'GitAuth successed';
         // Get the payload
         $payload = json_decode(file_get_contents('php://input'), true);
 
