@@ -27,8 +27,10 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
             // Check if the command was successful
             if ($return_var === 0) {
                 echo "Deployment successful.";
+                http_response_code(200);
             } else {
                 echo "Deployment failed: " . implode("\n", $output);
+                http_response_code(500);
             }
         } else {
             echo "Invalid request.";
