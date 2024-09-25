@@ -58,3 +58,46 @@ break;
 } else {
 $statusMessage = 'Deployment status file not found. Please check the deployment script.';
 }
+
+
+key: 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Deployment Result</h1>
+    <div class="status <?php echo ($statusCode == '200') ? 'success' : 'error'; ?>">
+        <p><?php echo $statusMessage; ?></p>
+    </div>
+    <h2>Deployment Log</h2>
+    <pre><?php echo htmlspecialchars(file_get_contents($logFile)); ?></pre>
+</body>
+
+</html>
