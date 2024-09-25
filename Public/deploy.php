@@ -14,30 +14,43 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
         http_response_code(403);
         exit;
     } else {
+
+
+
+
+
         // Get the payload
-        $payload = json_decode(file_get_contents('php://input'), true);
+$payload = json_decode(file_get_contents('php://input'), true);
 
-        // Validate if the request is from GitHub
-        if (isset($payload['ref']) && $payload['ref'] === 'refs/heads/dev') { // 'dev' branch ko check karein
-            // Command to pull the latest code
-            $output = null;
-            $return_var = null;
+// Validate if the request is from GitHub
+if (isset($payload['ref']) && $payload['ref'] === 'refs/heads/dev') { // 'dev' branch ko check karein
+    // Command to pull the latest code
+    $output = [];
+    $return_var = null;
 
-            // Run the git pull command
-            exec('cd /var/www/app.dhruvjoshi.dev/Public && git pull', $output, $return_var);
+    // Run the git pull command
+    exec('cd /var/www/app.dhruvjoshi.dev/Public && git pull 2>&1', $output, $return_var); // Error output ko bhi capture karein
 
-            echo '<pre>';
-            var_dump($output);
-            echo '</pre>';
-            // Check if the command was successful
-            if ($return_var === 0) {
-                echo "Deployment successful.";
-            } else {
-                echo "Deployment failed: " . implode("\n", $output);
-            }
-        } else {
-            echo "Invalid request.";
-        }
+    // Check if the command was successful
+    if ($return_var === 0) {
+        echo "Deployment successful.";
+    } else {
+        echo "Deployment failed: " . implode("\n", $output);
+    }
+} else {
+    echo "Invalid request.";
+}
+?>
+
+
+
+
+
+
+
+
+
+        
     }
 }
 ?>
