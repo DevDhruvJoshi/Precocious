@@ -14,27 +14,28 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
         http_response_code(403);
         exit;
     } else {
-// Get the payload
-$payload = json_decode(file_get_contents('php://input'), true);
+        // Get the payload
+        $payload = json_decode(file_get_contents('php://input'), true);
 
-// Validate if the request is from GitHub
-if (isset($payload['ref']) && $payload['ref'] === 'refs/heads/dev') { // 'dev' branch ko check karein
-    // Command to pull the latest code
-    $output = null;
-    $return_var = null;
+        // Validate if the request is from GitHub
+        if (isset($payload['ref']) && $payload['ref'] === 'refs/heads/dev') { // 'dev' branch ko check karein
+            // Command to pull the latest code
+            $output = null;
+            $return_var = null;
 
-    // Run the git pull command
-    exec('cd /var/www/app.dhruvjoshi.dev/Public && git pull', $output, $return_var);
+            // Run the git pull command
+            exec('cd /var/www/app.dhruvjoshi.dev/Public && git pull', $output, $return_var);
 
-    // Check if the command was successful
-    if ($return_var === 0) {
-        echo "Deployment successful.";
-    } else {
-        echo "Deployment failed: " . implode("\n", $output);
+            // Check if the command was successful
+            if ($return_var === 0) {
+                echo "Deployment successful.";
+            } else {
+                echo "Deployment failed: " . implode("\n", $output);
+            }
+        } else {
+            echo "Invalid request.";
+        }
     }
-} else {
-    echo "Invalid request.";
-}
 }
 ?>
 
@@ -73,24 +74,25 @@ $secret = '4cbEmv3UQzs4DUPG8G4zyMhhjpSzQX387whdH0Ciwz8UPDgbE32UgRsjY8kYg7i0'; //
 
 // Verify the GitHub signature if secret is used
 if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
-    $signature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
-    $hash = 'sha1=' . hash_hmac('sha1', file_get_contents('php://input'), $secret);
-    if ($signature !== $hash) {
-        http_response_code(403);
-        exit;
-    } else {
-            }}{ {       // Path to the deploy script
-        $scriptPath = '/home/ubuntu/deploy.sh';
+$signature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
+$hash = 'sha1=' . hash_hmac('sha1', file_get_contents('php://input'), $secret);
+if ($signature !== $hash) {
+http_response_code(403);
+exit;
+} else {
+}}{ { // Path to the deploy script
+$scriptPath = '/home/ubuntu/deploy.sh';
 
-        // Execute the deploy script and capture output
-        $output = shell_exec("$scriptPath 2>&1");
+// Execute the deploy script and capture output
+$output = shell_exec("$scriptPath 2>&1");
 
-        // Log the output to a file
-        file_put_contents('/var/www/html/deploy.log', $output);
+// Log the output to a file
+file_put_contents('/var/www/html/deploy.log', $output);
 
-        // Output the result to the browser (optional)
-        echo "<pre>$output</pre>";
-    }
+// Output the result to the browser (optional)
+echo "
+<pre>$output</pre>";
+}
 }
 
 exit();
@@ -107,21 +109,21 @@ $output = shell_exec("$scriptPath 2>&1");
 
 // Check the status of the deployment
 if (file_exists($statusFile)) {
-    $statusCode = trim(file_get_contents($statusFile));
-    http_response_code($statusCode);
-    switch ($statusCode) {
-        case '200':
-            $statusMessage = 'Deployment was successful.';
-            break;
-        case '500':
-            $statusMessage = 'Deployment failed. Please check the logs for details.';
-            break;
-        default:
-            $statusMessage = 'Unknown status. Please check the logs.';
-            break;
-    }
+$statusCode = trim(file_get_contents($statusFile));
+http_response_code($statusCode);
+switch ($statusCode) {
+case '200':
+$statusMessage = 'Deployment was successful.';
+break;
+case '500':
+$statusMessage = 'Deployment failed. Please check the logs for details.';
+break;
+default:
+$statusMessage = 'Unknown status. Please check the logs.';
+break;
+}
 } else {
-    $statusMessage = 'Deployment status file not found. Please check the deployment script.';
+$statusMessage = 'Deployment status file not found. Please check the deployment script.';
 }
 
 // Output the result to the browser
