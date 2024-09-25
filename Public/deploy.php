@@ -39,4 +39,5 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
             echo "Invalid request.";
         }
     }
+}
 ?>
