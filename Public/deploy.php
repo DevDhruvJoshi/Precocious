@@ -26,6 +26,9 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
             // Run the git pull command
             exec('cd /var/www/app.dhruvjoshi.dev/Public && git pull', $output, $return_var);
 
+            echo '<pre>';
+            var_dump($output);
+            echo '</pre>';
             // Check if the command was successful
             if ($return_var === 0) {
                 echo "Deployment successful.";
@@ -36,7 +39,8 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
             echo "Invalid request.";
         }
     }
-}
+
+
 ?>
 
 
@@ -64,9 +68,8 @@ if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
 
 
 
-
-
-
+<?php
+/*
 //require_once '/var/www/html/deploy.php'; exit;
 
 // Your secret token from GitHub Webhook setup
