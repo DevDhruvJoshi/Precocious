@@ -283,7 +283,7 @@ function SaveErrorLogFile($E, $EClassName = null) {
     $Msg = ('TID-' . (( TraceID !== null ) ? TraceID: '') . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
     $ErrorFile = ( TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/' . date('Y-m-d')) . '.log';
 //is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
-is_dir($ErrorFile) ? 'dir available': 'dir not available';
+echo is_dir($ErrorFile) ? 'dir available': 'dir not available';
     file_exists($ErrorFile) ?'' : touch($ErrorFile);
     file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
 }
