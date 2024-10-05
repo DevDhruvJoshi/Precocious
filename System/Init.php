@@ -64,7 +64,7 @@ class Init {
             }
         });
 
-        dd(Precocious::Install(0));
+        //dd(Precocious::Install(0));
         (new Precocious())->Run();
     }
 }
