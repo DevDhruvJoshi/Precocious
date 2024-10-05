@@ -2,7 +2,7 @@
 
 namespace System\Preload;
 
-use SystemExc;
+use System\Preload\SystemExc;
 use System\App\Tenant;
 use System\App\Session;
 
