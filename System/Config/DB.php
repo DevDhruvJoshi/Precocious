@@ -50,7 +50,7 @@ class DB {
             } else
                 throw new SystemExc("Unsupported database type: " . $this->Type);
         } catch (PDOException $E) {
-            //throw new DBExc($E->getMessage(), $E->getCode(), $E);
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
