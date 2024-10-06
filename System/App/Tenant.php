@@ -58,9 +58,7 @@ class Tenant extends \System\App\Tenant\Base
 
             // Setup tenant (example)
             if (!empty(SubDomain()) && 1 == 2) {
-                $tenantName = 'Tenant Name';
-                $tenantSubDomain = 'user1';
-                $tenantService->processTenant(tenantName: $tenantName, $tenantSubDomain);
+                $tenantService->processTenant('Tenant1','user1');
                 echo "Tenant setup completed successfully.\n";
             }
 
