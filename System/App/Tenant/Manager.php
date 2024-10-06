@@ -1,6 +1,10 @@
 <?php
 
 namespace System\App\Tenant;
+
+use PDO;
+use System\Preload\SystemExc;
+
 class Manager {
     private $tenantId;
     private $stepsFile;
@@ -32,7 +36,7 @@ class Manager {
         }
 
         if (!is_writable($this->baseDir)) {
-            throw new System\Preload\SystemExc("Directory {$this->baseDir} is not writable. Please set appropriate permissions.");
+            throw new SystemExc("Directory {$this->baseDir} is not writable. Please set appropriate permissions.");
         }
     }
 

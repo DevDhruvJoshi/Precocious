@@ -1,5 +1,8 @@
 <?php
 namespace System\App\Tenant;
+
+use PDO;
+
 class SystemValidator {
     private $pdo;
 

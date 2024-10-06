@@ -1,6 +1,9 @@
 <?php
 
 namespace System\App\Tenant;
+
+use System\Preload\SystemExc;
+
 class OwnerManager {
     private $validator;
 
@@ -17,7 +20,7 @@ class OwnerManager {
         }
 
         if (!is_writable($ownerDir)) {
-            throw new System\Preload\SystemExc("Directory {$ownerDir} is not writable. Please set appropriate permissions.");
+            throw new SystemExc("Directory {$ownerDir} is not writable. Please set appropriate permissions.");
         }
 
         if (!$this->validator->checkOwnerExists()) {
