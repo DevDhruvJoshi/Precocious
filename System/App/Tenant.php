@@ -42,8 +42,9 @@ class Tenant extends \System\App\Tenant\Base
     public static function Init()
     {
         // Initialize your DB instance
+
+        $validator = new SystemValidator(new DB());
         $db = new DB();
-        $validator = new SystemValidator($db);
         $ownerService = new OwnerService($validator, $db);
         $tenantService = new TenantService($validator, $db);
 
