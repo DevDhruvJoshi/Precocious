@@ -12,12 +12,6 @@ use System\App\Tenant\SystemValidator;
 class Precocious {
 
     public function __construct($URL = '') {
-        (new Session())->Init();
-        sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
-        sdd(' call From-' . FuncCallFrom());
-        sdd('Domain=' . Domain());
-        sdd('SubDomain=' . SubDomain());
-        sdd('BaseDomain=' . BaseDomain());
 
         /* */
 
@@ -39,6 +33,17 @@ class Precocious {
 
 
         /* */
+
+
+
+        (new Session())->Init();
+        sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
+        sdd(' call From-' . FuncCallFrom());
+        sdd('Domain=' . Domain());
+        sdd('SubDomain=' . SubDomain());
+        sdd('BaseDomain=' . BaseDomain());
+
+
         is_dir(TenantBaseDir) == true ?: throw new SystemExc('Tenant Folder is Required for this system. ' . TenantBaseDir, 11);
 
         $this->DomainConfig();
