@@ -64,7 +64,7 @@ class DB
                     $this->UseDB();
 
                 } else
-                    dd(' not selected DB' . $this->DB);
+                    return true;
 
 
             } else
