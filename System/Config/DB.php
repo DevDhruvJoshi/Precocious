@@ -74,7 +74,7 @@ class DB
     {
         try {
             $this->Connection->exec("USE `$this->DB`");
-        } catch (PDOException $e) {
+        } catch (PDOException $E) {
             // Ensure that DBExc is properly defined and can accept a message
             throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
