@@ -59,7 +59,7 @@ class DB
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 dd('vvvvvvvvvvvvvvvv');
                 dd(($this->DB)  );
-                dd( $this->CheckDBExisted($this->DB))
+                dd( $this->CheckDBExisted($this->DB));
                 !empty($this->DB) && $this->CheckDBExisted($this->DB) ? $this->UseDB() : '';
             } else
                 throw new SystemExc("Unsupported database type: " . $this->Type);
