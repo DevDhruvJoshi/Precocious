@@ -58,9 +58,9 @@ class DB
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 dd('vvvvvvvvvvvvvvvv');
-                dd(!empty($this->DB)  );
+                dd(($this->DB)  );
                 dd( $this->CheckDBExisted($this->DB))
-                !empty($this->DB)  && $this->CheckDBExisted($this->DB) ? $this->UseDB() : '';
+                !empty($this->DB) && $this->CheckDBExisted($this->DB) ? $this->UseDB() : '';
             } else
                 throw new SystemExc("Unsupported database type: " . $this->Type);
         } catch (PDOException $E) {
