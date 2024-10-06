@@ -1,45 +1,59 @@
 <?php
+
 namespace System\App\Tenant;
 
-use PDO;
+use System\Config\DB;
 
 class SystemValidator {
-    private $pdo;
+    private $db;
 
-    public function __construct() {
-        $this->initializeDatabaseConnection();
-    }
-
-    private function initializeDatabaseConnection() {
-        $type = strtolower(env('DB_Type'));
-        $host = env('DB_Host');
-        $user = env('DB_User');
-        $password = env('DB_Password');
-
-        $this->pdo = new PDO($type.":host=$host", $user, $password);
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    public function __construct(DB $db) {
+        $this->db = $db;
     }
 
     public function checkSubdomain($subDomain) {
-        $stmt = $this->pdo->prepare("SELECT * FROM Tenants WHERE SubDomain = :subDomain");
-        $stmt->execute(['subDomain' => $subDomain]);
-        return $stmt->rowCount() === 0; // True if subdomain does not exist
+        return $this->db->Select('Tenants', ['*'], ['SubDomain' => $subDomain]) === []; // True if subdomain does not exist
     }
 
-    public function checkOwnerExists() {
-        $ownerDbName = 'owner_db'; // Owner ka database naam
-    $this->createDatabaseIfNotExists($ownerDbName); // Ensure owner DB exists
+    public function checkOwnerExists(string $ownerDbName) {
+        $this->createDatabaseIfNotExists($ownerDbName); // Ensure owner DB exists
 
-    // Check if the Tenants table exists in the owner database
-    $this->pdo->exec("USE `$ownerDbName`");
-    $stmt = $this->pdo->prepare("SHOW TABLES LIKE 'Tenants'");
-    $stmt->execute();
+        // Check if the Tenants table exists in the owner database
+        $this->db->Connection->exec("USE `$ownerDbName`");
+        if (!$this->db->CheckTableExisted('Tenants')) {
+            // Tenants table does not exist, create it
+            $this->createOwnerTenantTable($ownerDbName);
+        }
 
-    if ($stmt->rowCount() === 0) {
-        // Tenants table does not exist, create it
-        $this->createOwnerTenantTable($ownerDbName);
+        return true; // Owner DB and table checks passed
     }
 
-    return true; // Owner DB and table checks passed
+    private function createDatabaseIfNotExists($dbName) {
+        if (!$this->db->CheckDBExisted($dbName)) {
+            $this->db->CreateDB($dbName);
+        }
+    }
+
+    private function createOwnerTenantTable($dbName) {
+        $createTableSQL = "
+        CREATE TABLE `Tenants` (
+          `ID` int(11) NOT NULL AUTO_INCREMENT,
+          `Name` varchar(255) NOT NULL,
+          `SubDomain` varchar(255) NOT NULL,
+          `Status` int(11) DEFAULT 0,
+          `DB_Type` varchar(255) DEFAULT NULL,
+          `DB_Host` varchar(255) DEFAULT NULL,
+          `DB_Name` varchar(255) DEFAULT NULL,
+          `DB_User` varchar(255) DEFAULT NULL,
+          `DB_Password` text DEFAULT NULL,
+          `Deleted` int(1) DEFAULT 0,
+          `DeletedAt` int(11) DEFAULT NULL,
+          PRIMARY KEY (`ID`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ";
+
+        $this->db->Connection->exec("USE `$dbName`");
+        $this->db->Connection->exec($createTableSQL);
     }
 }
+?>

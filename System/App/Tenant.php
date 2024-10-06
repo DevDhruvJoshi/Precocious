@@ -1,25 +1,34 @@
 <?php
 
 namespace System\App;
+use System\Config\DB;
+use System\App\Tenant\SystemValidator;
+use System\App\Service\OwnerService;
+use System\App\Service\TenantService;
+use System\Preload\SystemExc;
 
-class Tenant extends \System\App\Tenant\Base {
+class Tenant extends \System\App\Tenant\Base
+{
 
-//class Tenant extends \System\Config\DB{
+    //class Tenant extends \System\Config\DB{
 
     public static $_Table = 'Tenants';
     public static $_ID = 'ID';
     public static $_Trash = 'Deleted'; // Int 1 default 0
     public static $_TrashAt = 'DeletedAt'; // Int 11 default null
 
-    function __construct(...$argu) {
-        
+    function __construct(...$argu)
+    {
+
     }
 
-    static function Permission() {
+    static function Permission()
+    {
         return env('MultiTenancy') == 1 ? true : false;
     }
 
-    static function Install($ID = 0, $ErrorCode = null) { // pending all code intall setup one time
+    static function Install($ID = 0, $ErrorCode = null)
+    { // pending all code intall setup one time
         $R = [];
         $TenantDir = TenantBaseDir . ($ID) . DS;
         if ($ErrorCode == 12 || $ErrorCode === 0) // Tenant Dir Not Found Error code 12 
@@ -28,10 +37,40 @@ class Tenant extends \System\App\Tenant\Base {
             $R['CreateTenantErrorLogDir'] = is_dir($TenantDir . 'ErrorLog') ? 'Already Exiest' : mkdir($TenantDir . 'ErrorLog', 0777);
         if ($ErrorCode == 14 || $ErrorCode === 0) // Tenant Access LogDir Not Found Error code 14 
             $R['CreateTenantAccessLogDir'] = is_dir($TenantDir . 'AccessLog') ? 'Already Exiest' : mkdir($TenantDir . 'AccessLog', 0777);
-        return$R;
+        return $R;
+    }
+    public static function Init()
+    {
+        // Initialize your DB instance
+        $db = new DB();
+        $validator = new SystemValidator($db);
+        $ownerService = new OwnerService($validator, $db);
+        $tenantService = new TenantService($validator, $db);
+
+        // Here you can run any setup code as needed
+        // For example, setting up the owner and tenant
+        try {
+            // Setup owner (example)
+            $ownerName = 'Owner Name';
+            $ownerSubDomain = env('OwnerSubDomain');
+            $ownerService->ensureOwnerExists($ownerName, subDomain: subDomain: $ownerSubDomain);
+            echo "Owner setup completed successfully.\n";
+
+            // Setup tenant (example)
+            if(!empty(SubDomain()) && 1==2){
+            $tenantName = 'Tenant Name';
+            $tenantSubDomain = ;
+            $tenantService->processTenant($tenantName, $tenantSubDomain);
+            echo "Tenant setup completed successfully.\n";
+            }
+
+        } catch (SystemExc $e) {
+            echo "Tenant Setup failed: " . $e->getMessage() . "\n";
+        }
     }
 
-    static function DetailsBySubDomain(string $SubDomain = '') {
+    static function DetailsBySubDomain(string $SubDomain = '')
+    {
         if (!empty($SubDomain)) {
             if (!empty($T = Tenant::SelectOnes(['*'], ['SubDomain' => $SubDomain]))) {
                 //if (!empty($T = Tenant::Select([], 'SubDomain = "' . $SubDomain . '"'))) {
@@ -40,7 +79,8 @@ class Tenant extends \System\App\Tenant\Base {
         }
     }
 
-    static function IsVerified(string $SubDomain = '') {
+    static function IsVerified(string $SubDomain = '')
+    {
         try {
             $Tenant = self::DetailsBySubDomain(($SubDomain ?: SubDomain()) ?: '');
             if (!empty($Tenant)) {
@@ -72,7 +112,8 @@ class Tenant extends \System\App\Tenant\Base {
         }
     }
 
-    static function DBCredencial(string $SubDomain = '') {
+    static function DBCredencial(string $SubDomain = '')
+    {
         $Tenant = self::DetailsBySubDomain($SubDomain) ?: [];
         return !empty($Tenant) ? [
             'DB_Type' => $Tenant['DB_Type'] ?: '',
@@ -80,12 +121,13 @@ class Tenant extends \System\App\Tenant\Base {
             'DB_Name' => $Tenant['DB_Name'] ?: '',
             'DB_User' => $Tenant['DB_User'] ?: '',
             'DB_Password' => $Tenant['DB_Password'] ?: '',
-                ] :
-                ['DB_Type' => '',
-            'DB_Host' => '',
-            'DB_Name' => '',
-            'DB_User' => '',
-            'DB_Password' => '',
-        ];
+        ] :
+            [
+                'DB_Type' => '',
+                'DB_Host' => '',
+                'DB_Name' => '',
+                'DB_User' => '',
+                'DB_Password' => '',
+            ];
     }
 }

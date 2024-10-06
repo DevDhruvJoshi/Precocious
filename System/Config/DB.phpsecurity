@@ -1,0 +1,248 @@
+<?php
+
+namespace System\Config;
+
+use PDO;
+use PDOException;
+use System\App\Tenant;
+use System\Preload\DBExc;
+use System\Preload\SystemExc;
+
+/**
+ * Class DB
+ * Handles database operations such as connection, querying, and CRUD operations.
+ * Author: Dhruv Joshi
+ * Created on: 27-July-2024
+ */
+class DB
+{
+    private $Type = 'MySql';
+    private $Host = 'localhost';
+    private $DB = 'DMVC';
+    private $User = 'root';
+    private $Password = '';
+    public $Connection;
+
+    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null)
+    {
+        try {
+            if (Tenant::Permission()) {
+                if (!empty($Host) && !empty($Name)) {
+                    $this->Type = $Type ?: $this->Type;
+                    $this->Host = $Host;
+                    $this->DB = $Name;
+                    $this->User = $User;
+                    $this->Password = $Password;
+                } else if (!empty(SubDomain())) {
+                    $Tenant = Tenant::DBCredencial(SubDomain());
+                    $this->Type = $Tenant['DB_Type'];
+                    $this->Host = $Tenant['DB_Host'];
+                    $this->DB = $Tenant['DB_Name'];
+                    $this->User = $Tenant['DB_User'];
+                    $this->Password = $Tenant['DB_Password'];
+                }
+            } else {
+                $this->Type = env('DB_Type');
+                $this->Host = env('DB_Host');
+                $this->DB = env('DB_Name');
+                $this->User = env('DB_User');
+                $this->Password = env('DB_Password');
+            }
+
+            if (($this->Type = trim(strtolower($this->Type))) === 'mysql') {
+                $this->Connection = new PDO("$this->Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password);
+                $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } else {
+                throw new SystemExc("Unsupported database type: " . $this->Type);
+            }
+        } catch (PDOException $e) {
+            throw new DBExc($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    private function UseDB()
+    {
+        try {
+            $this->Connection->exec("USE `$this->DB`");
+        } catch (PDOException $e) {
+            throw new DBExc("Failed to connect to database: " . $e->getMessage());
+        }
+    }
+
+    public function CheckDBExisted($dbName)
+    {
+        $sql = "SHOW DATABASES LIKE ?";
+        $stmt = $this->Connection->prepare($sql);
+        $stmt->execute([$dbName]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function CreateDB($dbName)
+    {
+        $sql = "CREATE DATABASE `$dbName`";
+        $stmt = $this->Connection->prepare($sql);
+        return $stmt->execute();
+    }
+
+    public function CheckTableExisted($tableName)
+    {
+        $sql = "SHOW TABLES LIKE ?";
+        $stmt = $this->Connection->prepare($sql);
+        $stmt->execute([$tableName]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function CreateTable($tableName, $columns)
+    {
+        $columnDefs = implode(", ", $columns);
+        $sql = "CREATE TABLE `$tableName` ($columnDefs)";
+        $stmt = $this->Connection->prepare($sql);
+        return $stmt->execute();
+    }
+
+    public function RunBigSQLFile($filePath)
+    {
+        if (!file_exists($filePath)) {
+            throw new \Exception("SQL file does not exist: $filePath");
+        }
+
+        $sql = file_get_contents($filePath);
+        $statements = explode(';', $sql);
+
+        foreach ($statements as $statement) {
+            $trimmed = trim($statement);
+            if (!empty($trimmed)) {
+                $stmt = $this->Connection->prepare($trimmed);
+                $stmt->execute();
+            }
+        }
+
+        return true;
+    }
+
+    public function Insert($table, array $data)
+    {
+        $columns = implode(',', array_map(fn($col) => "`$col`", array_keys($data)));
+        $placeholders = implode(',', array_fill(0, count($data), '?'));
+        $sql = "INSERT INTO `$table` ($columns) VALUES ($placeholders)";
+
+        try {
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute(array_values($data));
+            return $this->Connection->lastInsertId();
+        } catch (PDOException $e) {
+            throw new DBExc("Insert error: " . $e->getMessage());
+        }
+    }
+
+    public function Replace($table, array $data)
+    {
+        $columns = implode(',', array_map(fn($col) => "`$col`", array_keys($data)));
+        $placeholders = implode(',', array_fill(0, count($data), '?'));
+        $sql = "REPLACE INTO `$table` ($columns) VALUES ($placeholders)";
+
+        try {
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute(array_values($data));
+            return $this->Connection->lastInsertId();
+        } catch (PDOException $e) {
+            throw new DBExc("Replace error: " . $e->getMessage());
+        }
+    }
+
+    public function Update($table, array $data, array $where)
+    {
+        $set_clauses = [];
+        $params = [];
+
+        foreach ($data as $column => $value) {
+            $set_clauses[] = "`$column` = ?";
+            $params[] = $value;
+        }
+        $set_string = implode(', ', $set_clauses);
+
+        $where_clauses = [];
+        foreach ($where as $column => $value) {
+            $where_clauses[] = "`$column` = ?";
+            $params[] = $value;
+        }
+
+        $where_string = implode(' AND ', $where_clauses);
+        $sql = "UPDATE `$table` SET $set_string WHERE $where_string";
+
+        try {
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            throw new DBExc("Update error: " . $e->getMessage());
+        }
+    }
+
+    public function Select(string $table, array $columns, array|string $where = null, array $join = [], array $groupBy = [], array $having = [], array|string $orderBy = null, int $limit = null, int $offset = null)
+    {
+        $select_string = implode(', ', array_map(fn($col) => "`$col`", $columns));
+        $from_string = "`$table`";
+
+        $join_string = '';
+        foreach ($join as $joinTable => $joinCondition) {
+            $join_string .= " JOIN `$joinTable` ON $joinCondition";
+        }
+
+        $where_string = '';
+        $params = [];
+        if (!empty($where)) {
+            if (is_array($where)) {
+                $where_clauses = [];
+                foreach ($where as $column => $value) {
+                    $where_clauses[] = "`$column` = ?";
+                    $params[] = $value;
+                }
+                $where_string = ' WHERE ' . implode(' AND ', $where_clauses);
+            } else {
+                $where_string = ' WHERE ' . $where;
+            }
+        }
+
+        $group_by_string = !empty($groupBy) ? ' GROUP BY ' . implode(', ', array_map(fn($col) => "`$col`", $groupBy)) : '';
+        $having_string = !empty($having) ? ' HAVING ' . implode(' AND ', $having) : '';
+        $order_by_string = !empty($orderBy) ? ' ORDER BY ' . implode(', ', array_map(fn($col, $dir) => "`$col` $dir", array_keys($orderBy), $orderBy)) : '';
+        $limit_offset_string = !is_null($limit) ? ' LIMIT ' . $limit . (!is_null($offset) ? ' OFFSET ' . $offset : '') : '';
+
+        $sql = "SELECT $select_string FROM $from_string $join_string $where_string $group_by_string $having_string $order_by_string $limit_offset_string";
+        try {
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new DBExc("Select error: " . $e->getMessage());
+        }
+    }
+
+    public function Delete($table, array $where)
+    {
+        $where_clauses = [];
+        $params = [];
+
+        foreach ($where as $column => $value) {
+            $where_clauses[] = "`$column` = ?";
+            $params[] = $value;
+        }
+
+        $where_string = implode(' AND ', $where_clauses);
+        $sql = "DELETE FROM `$table` WHERE $where_string";
+
+        try {
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            throw new DBExc("Delete error: " . $e->getMessage());
+        }
+    }
+
+    public function __destruct()
+    {
+        $this->Connection = null;
+    }
+}

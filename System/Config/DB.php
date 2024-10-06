@@ -2,14 +2,22 @@
 
 namespace System\Config;
 
+use Exception;
 use PDO;
 use PDOException;
+use PDOStatement;
 use \System\App\Tenant;
 use System\Preload\DBExc;
 use System\Preload\SystemExc;
+/**
+ * Class DB
+ * Handles database operations such as connection, querying, and CRUD operations.
+ * Author: Dhruv Joshi
+ * Created on: 27-July-2024
+ */
 
-
-class DB {
+class DB
+{
 
     private $Type = 'MySql';
     private $Host = 'localhost';
@@ -18,7 +26,8 @@ class DB {
     private $Password = '';
     public $Connection;
 
-    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null) {
+    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null)
+    {
         try {
 
             if (Tenant::Permission() == true) {
@@ -44,9 +53,11 @@ class DB {
                 $this->Password = env('DB_Password');
             }
 
-            if (($Type = trim(strtolower($this->Type)) ) == 'mysql') {
-                $this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password);
+            if (($Type = trim(strtolower($this->Type))) == 'mysql') {
+                //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
+                $this->Connection = new PDO("$this->Type:host=$this->Host", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                !empty($this->DB) ? $this->UseDB() : '';
             } else
                 throw new SystemExc("Unsupported database type: " . $this->Type);
         } catch (PDOException $E) {
@@ -54,8 +65,137 @@ class DB {
         }
     }
 
-    // Function for inserting data
-    public function Insert($table, array $data) {
+    /**
+     * Use a specific database after establishing a connection.
+     *
+     * @throws DBExc
+     */
+    private function UseDB()
+    {
+        try {
+            $this->Connection->exec("USE `$this->DB`");
+        } catch (PDOException $E) {
+            throw new DBExc("Failed to connect to database: " . $E->getMessage());
+        }
+    }
+
+
+    /**
+     * Check if a database exists.
+     *
+     * @param string $dbName The name of the database to check.
+     * @return bool True if the database exists, false otherwise.
+     * @throws DBExc
+     *
+     * Example:
+     * $dbExists = $db->CheckDBExisted('test_db');
+     */
+    public function CheckDBExisted($dbName)
+    {
+        $sql = "SHOW DATABASES LIKE ?";
+        $stmt = $this->Connection->prepare($sql);
+        $stmt->execute([$dbName]);
+        return $stmt->rowCount() > 0;
+    }
+
+
+    /**
+     * Create a new database.
+     *
+     * @param string $dbName The name of the database to create.
+     * @return bool True on success, false on failure.
+     * @throws DBExc
+     *
+     * Example:
+     * $db->CreateDB('new_database');
+     */
+    public function CreateDB($dbName)
+    {
+        $sql = "CREATE DATABASE `$dbName`";
+        $stmt = $this->Connection->prepare($sql);
+        return $stmt->execute();
+    }
+
+    /**
+     * Check if a table exists in the current database.
+     *
+     * @param string $tableName The name of the table to check.
+     * @return bool True if the table exists, false otherwise.
+     * @throws DBExc
+     *
+     * Example:
+     * $tableExists = $db->CheckTableExisted('users');
+     */
+    public function CheckTableExisted($tableName)
+    {
+        $sql = "SHOW TABLES LIKE ?";
+        $stmt = $this->Connection->prepare($sql);
+        $stmt->execute([$tableName]);
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Create a new table in the current database.
+     *
+     * @param string $tableName The name of the table to create.
+     * @param array $columns Array of column definitions (e.g., ['id INT PRIMARY KEY', 'name VARCHAR(255)']).
+     * @return bool True on success, false on failure.
+     * @throws DBExc
+     *
+     * Example:
+     * $db->CreateTable('users', ['id INT PRIMARY KEY', 'name VARCHAR(255)']);
+     */
+    public function CreateTable($tableName, $columns)
+    {
+        $columnDefs = implode(", ", $columns);
+        $sql = "CREATE TABLE `$tableName` ($columnDefs)";
+        $stmt = $this->Connection->prepare($sql);
+        return $stmt->execute();
+    }
+    /**
+     * Run a large SQL file containing multiple statements.
+     *
+     * @param string $filePath The path to the SQL file.
+     * @return bool True on success.
+     * @throws Exception|DBExc
+     *
+     * Example:
+     * $db->RunBigSQLFile('path/to/script.sql');
+     */
+    public function RunBigSQLFile($filePath)
+    {
+        if (!file_exists($filePath)) {
+            throw new \Exception("SQL file does not exist: $filePath");
+        }
+
+        $sql = file_get_contents($filePath);
+        $statements = explode(';', $sql);
+
+        foreach ($statements as $statement) {
+            $trimmed = trim($statement);
+            if (!empty($trimmed)) {
+                $stmt = $this->Connection->prepare($trimmed);
+                $stmt->execute();
+            }
+        }
+
+        return true; // Indicate success
+    }
+
+
+    /**
+     * Insert data into a specified table.
+     *
+     * @param string $table The name of the table.
+     * @param array $data Associative array of data to insert (e.g., ['name' => 'John', 'age' => 30]).
+     * @return int The ID of the inserted row.
+     * @throws DBExc
+     *
+     * Example:
+     * $insertId = $db->Insert('users', ['name' => 'John', 'age' => 30]);
+     */
+    public function Insert($table, array $data)
+    {
         $columns = implode(',', array_keys($data));
         $placeholders = implode(',', array_fill(0, count($data), '?'));
         $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
@@ -72,8 +212,19 @@ class DB {
         }
     }
 
-    // Function for replce data
-    public function Replace($table, array $data) {
+    /**
+     * Replace data in a specified table.
+     *
+     * @param string $table The name of the table.
+     * @param array $data Associative array of data to replace (e.g., ['id' => 1, 'name' => 'Doe']).
+     * @return int The ID of the replaced row.
+     * @throws DBExc
+     *
+     * Example:
+     * $db->Replace('users', ['id' => 1, 'name' => 'Doe']);
+     */
+    public function Replace($table, array $data)
+    {
         $columns = implode(',', array_keys($data));
         $placeholders = implode(',', array_fill(0, count($data), '?'));
         $sql = "REPLACE INTO $table ($columns) VALUES ($placeholders)";
@@ -90,8 +241,20 @@ class DB {
         }
     }
 
-    // Function for updating data
-    public function Update($table, array $data, array $where) {
+    /**
+     * Update data in a specified table based on conditions.
+     *
+     * @param string $table The name of the table.
+     * @param array $data Associative array of data to update.
+     * @param array $where Associative array of conditions (e.g., ['id' => 1]).
+     * @return int The number of affected rows.
+     * @throws DBExc
+     *
+     * Example:
+     * $affectedRows = $db->Update('users', ['name' => 'Jane'], ['id' => 1]);
+     */
+    public function Update($table, array $data, array $where)
+    {
         $set_clauses = array();
         $params = array();
 
@@ -155,24 +318,38 @@ class DB {
         }
     }
 
-    // Function for select data
-    /*
-     * 
-     * 
-      $columns = ['users.name', 'orders.total'];
-      $where = ['users.is_active' => 1, 'orders.created_at >' => '2023-01-01'];
-      $join = ['orders' => 'users.id = orders.user_id'];
-      $groupBy = ['users.name'];
-      $having = ['COUNT(*) > 5'];
-      $orderBy = ['orders.total' => 'DESC'];
-      $limit = 10;
-      $offset = 0;
+    /**
+     * Select data from a specified table with optional filters and sorting.
+     *
+     * This method retrieves data using various conditions, joins, grouping, and ordering options.
+     *
+     * @param string $table The name of the table to select from.
+     * @param array $columns The columns to select (e.g., ['users.name', 'orders.total']).
+     * @param array|string|null $where Optional associative array of conditions (e.g., ['users.is_active' => 1, 'orders.created_at >' => '2023-01-01']).
+     * @param array $join Optional array of join conditions (e.g., ['orders' => 'users.id = orders.user_id']).
+     * @param array $groupBy Optional array of columns to group by (e.g., ['users.name']).
+     * @param array $having Optional array of having conditions (e.g., ['COUNT(*) > 5']).
+     * @param array|string|null $orderBy Optional array for ordering the results (e.g., ['orders.total' => 'DESC']).
+     * @param int|null $limit Optional limit for the number of results (e.g., 10).
+     * @param int|null $offset Optional offset for the results (e.g., 0).
+     * @return array The fetched data.
+     * @throws DBExc If there is an error during the query execution.
+     *
+     * Example usage:
+     * $columns = ['users.name', 'orders.total'];
+     * $where = ['users.is_active' => 1, 'orders.created_at >' => '2023-01-01'];
+     * $join = ['orders' => 'users.id = orders.user_id'];
+     * $groupBy = ['users.name'];
+     * $having = ['COUNT(*) > 5'];
+     * $orderBy = ['orders.total' => 'DESC'];
+     * $limit = 10;
+     * $offset = 0;
+     * $results = $db->Select($table, $columns, $where, $join, $groupBy, $having, $orderBy, $limit, $offset);
+     * Pending $Where need always array but not working != in this function 
+     */
 
-      $results = $this->DB->Select->Select('users', $columns, $where, $join, $groupBy, $having, $orderBy, $limit, $offset);
-     * 
-     *  */
-    // Pending $Where need always array but not working != in this function 
-    public function Select(string $table, array $columns, array|string $where = null, array $join = [], array $groupBy = [], array $having = [], array|string $orderBy = null, int $limit = null, int $offset = null) {
+    public function Select(string $table, array $columns, array|string $where = null, array $join = [], array $groupBy = [], array $having = [], array|string $orderBy = null, int $limit = null, int $offset = null)
+    {
         $select_string = implode(', ', $columns);
 
         $from_string = $table;
@@ -254,8 +431,20 @@ class DB {
         }
     }
 
-    // Function for deleting data
-    public function Delete($table, array $where) {
+
+    /**
+     * Delete data from a specified table based on conditions.
+     *
+     * @param string $table The name of the table.
+     * @param array $where Associative array of conditions (e.g., ['id' => 1]).
+     * @return int The number of deleted rows.
+     * @throws DBExc
+     *
+     * Example:
+     * $deletedRows = $db->Delete('users', ['id' => 1]);
+     */
+    public function Delete($table, array $where)
+    {
 
         $where_clauses = [];
         $params = [];
@@ -285,8 +474,19 @@ class DB {
         }
     }
 
-    // Function for executing custom queries
-    public function Query($sql, array $params = []) {
+    /**
+     * Execute a custom SQL query.
+     *
+     * @param string $sql The SQL query to execute.
+     * @param array $params Optional array of parameters for the query.
+     * @return PDOStatement The PDOStatement object for further processing.
+     * @throws DBExc
+     *
+     * Example:
+     * $stmt = $db->Query('SELECT * FROM users WHERE age > ?', [18]);
+     */
+    public function Query($sql, array $params = [])
+    {
         try {
             $stmt = $this->Connection->prepare($sql);
             $I = 1;
@@ -300,20 +500,35 @@ class DB {
         }
     }
 
-    public static function Table($Table) {
+    public static function Table($Table)
+    {
         $DB = new DB();
         return $D = $DB->Query('select * from ' . $Table . ';');
     }
-
-    public function Fetch($stmt) {
+    /**
+     * Fetch all results from a PDOStatement.
+     *
+     * @param PDOStatement $stmt The prepared statement.
+     * @return array The fetched results.
+     */
+    public function Fetch($stmt)
+    {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function Escape($value) { // SQL injection need to use but pending impimention allover framwork
+    /**
+     * Escape a value for safe use in SQL.
+     *
+     * @param mixed $value The value to escape.
+     * @return string The escaped value.
+     */
+    public function Escape($value)
+    { // SQL injection need to use but pending impimention allover framwork
         return $this->Connection->quote($value);
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         /*         * /
           if ($this->Connection) {
           $this->Connection->close();
