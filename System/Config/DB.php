@@ -57,6 +57,9 @@ class DB
                 //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                dd('vvvvvvvvvvvvvvvv');
+                dd(!empty($this->DB)  );
+                dd( $this->CheckDBExisted($this->DB))
                 !empty($this->DB)  && $this->CheckDBExisted($this->DB) ? $this->UseDB() : '';
             } else
                 throw new SystemExc("Unsupported database type: " . $this->Type);
