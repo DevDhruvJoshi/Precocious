@@ -74,9 +74,8 @@ class DB
     {
         try {
             $this->Connection->exec("USE `$this->DB`");
-        } catch (PDOException $E) {
-            exit($E->getMessage());
-            throw new DBExc("Failed to connect to database: " . $E->getMessage());
+        } catch (PDOException $e) {
+            throw new DBExc("UseDB error: " . $e->getMessage());
         }
     }
 
