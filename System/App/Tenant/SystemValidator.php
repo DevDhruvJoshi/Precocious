@@ -32,6 +32,7 @@ class SystemValidator {
         if (!$this->db->CheckDBExisted($dbName)) {
             $this->db->CreateDB($dbName);
         }
+        $this->db = new DB();
     }
 
     private function createOwnerTenantTable($dbName) {
