@@ -64,8 +64,8 @@ class DB
                     $this->UseDB();
 
                 } else {
-                    $this->CreateDB($this->DB); // Create the database if it does not exist
-                    $this->UseDB(); // Now select the newly created database
+                    //$this->CreateDB($this->DB); // Create the database if it does not exist
+                    //$this->UseDB(); // Now select the newly created database
                 }
 
 
