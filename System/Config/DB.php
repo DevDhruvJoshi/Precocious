@@ -208,8 +208,8 @@ class DB
                 $stmt->bindValue($I++, $value);
             $stmt->execute();
             return $this->Connection->lastInsertId(); // Return the inserted ID (if applicable)
-        } catch (PDOException $e) {
-            throw new DBExc("Insert error: " . $e->getMessage());
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
@@ -237,8 +237,8 @@ class DB
             foreach ($data as $index => $value)
                 $stmt->bindValue($I++, $value);
             return $this->Connection->lastInsertId(); // Return the inserted ID (if applicable)
-        } catch (PDOException $e) {
-            throw new DBExc("Insert error: " . $e->getMessage());
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
@@ -314,8 +314,8 @@ class DB
             }
             $stmt->execute();
             return $stmt->rowCount();
-        } catch (PDOException $e) {
-            throw new DBExc("Update error: " . $e->getMessage());
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
@@ -427,8 +427,8 @@ class DB
             }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            throw new DBExc("SQL Select: " . $e->getMessage());
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
@@ -470,8 +470,8 @@ class DB
             $stmt = $this->Connection->prepare($sql);
             $stmt->execute($params);
             return $stmt->rowCount(); // Return the number of deleted rows
-        } catch (PDOException $e) {
-            throw new DBExc("Delete error: " . $e->getMessage());
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
