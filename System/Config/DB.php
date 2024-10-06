@@ -104,6 +104,7 @@ class DB
         $sql = "SHOW DATABASES LIKE ?";
         $stmt = $this->Connection->prepare($sql);
         $stmt->execute([$dbName]);
+        dd($stmt->rowCount());
         return $stmt->rowCount() > 0;
     }
 
