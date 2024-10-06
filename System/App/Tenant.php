@@ -53,7 +53,7 @@ class Tenant extends \System\App\Tenant\Base
             // Setup owner (example)
             $ownerName = 'Owner Name';
             $ownerSubDomain = env('OwnerSubDomain');
-            $ownerService->ensureOwnerExists($ownerName, subDomain: subDomain: $ownerSubDomain);
+            $ownerService->ensureOwnerExists($ownerName,$ownerSubDomain);
             echo "Owner setup completed successfully.\n";
 
             // Setup tenant (example)
