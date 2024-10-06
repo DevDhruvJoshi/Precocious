@@ -5,6 +5,9 @@ namespace System\Preload;
 use System\Preload\SystemExc;
 use System\App\Tenant;
 use System\App\Session;
+use System\App\Tenant\Manager;
+use System\App\Tenant\OwnerManager;
+use System\App\Tenant\SystemValidator;
 
 class Precocious {
 
@@ -16,6 +19,26 @@ class Precocious {
         sdd('SubDomain=' . SubDomain());
         sdd('BaseDomain=' . BaseDomain());
 
+        /* */
+
+        try {
+            $validator = new SystemValidator();
+        
+            // Process Owner
+            $ownerManager = new OwnerManager($validator);
+            $ownerManager->processOwner();
+        
+            // Process Tenant
+            $tenantManager = new Manager('tenant1', $validator);
+            echo json_encode($tenantManager->processTenant('Apple Inc.', 'user1'));
+        
+        } catch (SystemExc $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+
+
+
+        /* */
         is_dir(TenantBaseDir) == true ?: throw new SystemExc('Tenant Folder is Required for this system. ' . TenantBaseDir, 11);
 
         $this->DomainConfig();
