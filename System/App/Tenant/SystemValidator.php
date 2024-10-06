@@ -11,7 +11,7 @@ class SystemValidator {
     }
 
     private function initializeDatabaseConnection() {
-        $type = env('DB_Type');
+        $type = strtolower(env('DB_Type'));
         $host = env('DB_Host');
         $user = env('DB_User');
         $password = env('DB_Password');
