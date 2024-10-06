@@ -44,21 +44,21 @@ class Tenant extends \System\App\Tenant\Base
         // Initialize your DB instance
 
         $validator = new SystemValidator(new DB());
-        $db = new DB();
-        $ownerService = new OwnerService($validator, $db);
-        $tenantService = new TenantService($validator, $db);
+
+
 
         // Here you can run any setup code as needed
         // For example, setting up the owner and tenant
         try {
             // Setup owner (example)
-            $ownerName = 'Owner Name';
-            $ownerSubDomain = env('OwnerSubDomain');
-            $ownerService->ensureOwnerExists($ownerName, $ownerSubDomain);
+            $db = new DB();
+            $ownerService = new OwnerService($validator, $db);
+            $ownerService->ensureOwnerExists('Owner Name',env('OwnerSubDomain'));
             echo "Owner setup completed successfully.\n";
 
             // Setup tenant (example)
             if (!empty(SubDomain()) && 1 == 2) {
+                $tenantService = new TenantService($validator, $db);
                 $tenantService->processTenant('Tenant1','user1');
                 echo "Tenant setup completed successfully.\n";
             }

@@ -30,7 +30,6 @@ class SystemValidator {
 
     private function createDatabaseIfNotExists($dbName) {
         if (!$this->db->CheckDBExisted($dbName)) {
-            echo 'DB not found '.$dbName;
             $this->db->CreateDB($dbName);
             $this->db = new DB();
         }
