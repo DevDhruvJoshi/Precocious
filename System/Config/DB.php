@@ -64,7 +64,7 @@ class DB
                     $this->UseDB();
 
                 } else
-                    return true;
+                    return;
 
 
             } else
