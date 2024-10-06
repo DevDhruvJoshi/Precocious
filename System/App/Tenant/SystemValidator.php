@@ -11,11 +11,12 @@ class SystemValidator {
     }
 
     private function initializeDatabaseConnection() {
-        $host = getenv('DB_HOST');
-        $user = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
+        $type = env('DB_Type');
+        $host = env('DB_Host');
+        $user = env('DB_User');
+        $password = env('DB_Password');
 
-        $this->pdo = new PDO("mysql:host=$host", $user, $password);
+        $this->pdo = new PDO($type.":host=$host", $user, $password);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
