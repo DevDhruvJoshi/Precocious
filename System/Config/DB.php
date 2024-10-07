@@ -53,7 +53,7 @@ class DB
                 $this->Password = env('DB_Password');
             }
             try {
-                $pdo = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+                $this->Connection = $pdo = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 $this->CheckDBExisted($this->DB);
                 echo "Connection successful!";
             } catch (PDOException $e) {
