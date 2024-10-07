@@ -43,7 +43,9 @@ class Tenant extends \System\App\Tenant\Base
     {
         // Initialize your DB instance
 
-        $validator = new SystemValidator(new DB());
+        $db = new DB();
+        dd($db->ListAll());
+        $validator = new SystemValidator($db);
 
 
 
@@ -52,7 +54,6 @@ class Tenant extends \System\App\Tenant\Base
         try {
             // Setup owner (example)
             $db = new DB();
-            dd($db->ListAll());
             $ownerService = new OwnerService($validator, $db);
             $ownerService->ensureOwnerExists('Owner Name',env('OwnerSubDomain'));
             echo "Owner setup completed successfully.\n";
