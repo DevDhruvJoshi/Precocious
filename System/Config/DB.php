@@ -90,6 +90,27 @@ class DB
         }
     }
 
+    public function ListAll()
+{
+    $databases = [];
+
+    try {
+        // Prepare the SQL query to list all databases
+        $sql = "SHOW DATABASES";
+        $stmt = $this->Connection->prepare($sql);
+        $stmt->execute();
+
+        // Fetch all database names
+        $databases = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    } catch (PDOException $E) {
+        // Ensure that DBExc is properly defined and can accept a message
+        throw new DBExc($E->getMessage(), $E->getCode(), $E);
+    }
+
+    return $databases; // Return the list of databases
+}
+
+
 
     /**
      * Check if a database exists.
