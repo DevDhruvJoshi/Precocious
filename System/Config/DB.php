@@ -59,6 +59,11 @@ class DB
                 try {
                     $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                     if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
+                        $this->UseDB();
+                    } else {
+
+                        //$this->CreateDB($this->DB); // Create the database if it does not exist
+                        //$this->UseDB(); // Now select the newly created database
                     }
                     echo "Connection successful!";
                 } catch (PDOException $E) {
@@ -71,7 +76,7 @@ class DB
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
-                    $this->UseDB(); 
+                    $this->UseDB();
                 } else {
 
                     //$this->CreateDB($this->DB); // Create the database if it does not exist
@@ -118,7 +123,7 @@ class DB
     {
         // Initialize result as false
         $exists = false;
-    
+
         if (!empty($dbName)) {
             try {
                 // Prepare the SQL query to check for the existence of the database
@@ -133,10 +138,10 @@ class DB
                 //error_log("Error checking database existence: " . $e->getMessage());
             }
         }
-    
+
         return $exists; // Return the result (true or false)
     }
-    
+
 
 
     /**
