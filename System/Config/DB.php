@@ -113,13 +113,26 @@ class DB
      */
     public function CheckDBExisted($dbName)
     {
-        if(!empty($dbName)){
-        $sql = "SHOW DATABASES LIKE ?";
-        $stmt = $this->Connection->prepare($sql);
-        $stmt->execute([$dbName]);
-        return $stmt->rowCount() > 0;
+        // Initialize result as false
+        $exists = false;
+    
+        if (!empty($dbName)) {
+            try {
+                // Prepare the SQL query to check for the existence of the database
+                $sql = "SHOW DATABASES LIKE ?";
+                $stmt = $this->Connection->prepare($sql);
+                $stmt->execute([$dbName]);
+                $exists = $stmt->rowCount() > 0; // Set exists to true if a database is found
+            } catch (PDOException $e) {
+                // Log the error or handle it as needed
+                // For example, log the error without throwing it to prevent stopping execution
+                error_log("Error checking database existence: " . $e->getMessage());
+            }
         }
+    
+        return $exists; // Return the result (true or false)
     }
+    
 
 
     /**
