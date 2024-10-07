@@ -32,7 +32,7 @@ class DBBased implements \SessionHandlerInterface {
     }
 
     public function Read($id): string|false {
-        $Res = $this->DB->Select('sessions', ['data'], [
+        $Res = $this->DB->Select('Sessions', ['data'], [
             'session_id' => $id,
             'IP' => ClientIP(),
             'Browser' => base64_encode($_SERVER['HTTP_USER_AGENT']),
@@ -41,7 +41,7 @@ class DBBased implements \SessionHandlerInterface {
     }
 
     public function Write($id, $data): bool {
-        $this->DB->Replace('sessions', [
+        $this->DB->Replace('Sessions', [
             'session_id' => $id,
             'data' => $data,
             'IP' => ClientIP(),
@@ -51,12 +51,12 @@ class DBBased implements \SessionHandlerInterface {
     }
 
     public function destroy($id): bool {
-        $this->DB->Delete('sessions', ['session_id' => $id]);
+        $this->DB->Delete('Sessions', ['session_id' => $id]);
         return true;
     }
 
     public function gc($maxlifetime) : int|false{
-        $stmt = $this->DB->Query("DELETE FROM sessions WHERE modified < DATE_SUB(NOW(), INTERVAL ? SECOND)", [$maxlifetime]);
+        $stmt = $this->DB->Query("DELETE FROM Sessions WHERE modified < DATE_SUB(NOW(), INTERVAL ? SECOND)", [$maxlifetime]);
 
         return 1;
     }
