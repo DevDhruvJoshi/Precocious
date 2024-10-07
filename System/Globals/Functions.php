@@ -5,48 +5,56 @@ use System\Preload\DBExc;
 use System\Preload\Exc;
 use System\Preload\SystemExc;
 
-function vd($D, $E = 0) {
+function vd($D, $E = 0)
+{
     var_dump($D);
     if ($E == 1)
         exit();
 }
 
-function sdd(...$args) { // it's only for framwork debuging
+function sdd(...$args)
+{ // it's only for framwork debuging
     //return dd(...$args);
 }
 
-function dd($V, $E = 0) {
-    echo!is_array($V) ? '' : '<pre>';
+function dd($V, $E = 0)
+{
+    echo !is_array($V) ? '' : '<pre>';
     echo ('</br>');
     if (!is_array($V))
         echo $V ?: 'empty';
     else
         var_dump($V ?: 'empty');
-    echo!is_array($V) ? '' : '</pre>';
+    echo !is_array($V) ? '' : '</pre>';
     echo ('</br>');
     if ($E == 1)
         exit();
 }
 
-function env(string $K) {
+function env(string $K)
+{
     return isset($K) ? $_ENV[$K] : null;
 }
 
-function FuncCallFrom() {
+function FuncCallFrom()
+{
     $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
     return $caller = isset($dbt[2]['function']) ? (isset($dbt[2]['class']) ? trim(str_replace('\\', '/', ($dbt[2]['file'])), Root) . '@' . ($dbt[2]['class'] . $dbt[2]['type']) : '') . $dbt[2]['function'] : null;
 }
 
 //function Response($S, $M, $D, Exc|DBExc|Exception|SystemExc|null $E = null) {
-function Response($S, $M, $D, $E = null) {
+function Response($S, $M, $D, $E = null)
+{
     /*     */
-    View('Response', [
-        'Status' => $S,
-        'Msg' => $M,
-        'Data' => $D,
-        'SubView' => ( View('About', ['Status' => $S], true)),
-        'Exc' => $E,
-            ]
+    View(
+        'Response',
+        [
+            'Status' => $S,
+            'Msg' => $M,
+            'Data' => $D,
+            'SubView' => (View('About', ['Status' => $S], true)),
+            'Exc' => $E,
+        ]
     );
     /* */
 }
@@ -62,25 +70,28 @@ function Response($S, $M, $D, $E = null) {
  * @DevelopBy Dev.Dhruv Joshi
  */
 //function View(string $string, string $token): string|false {}
-function View(string $File = '', array $D = [], bool $ReturnContent = false): string|false|null {
+function View(string $File = '', array $D = [], bool $ReturnContent = false): string|false|null
+{
     echo !class_exists('System\App\View') ? include System . 'App' . DS . 'View.php' : '';
     if ($ReturnContent == true)
-        return (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = false) )->Content();
+        return (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = false))->Content();
     else
         echo (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = false))->Render();
     return '';
 }
 
-function SystemView(string $File = '', array $D = [], bool $ReturnContent = false): string|false|null {
+function SystemView(string $File = '', array $D = [], bool $ReturnContent = false): string|false|null
+{
     echo !class_exists('System\App\View') ? include System . 'App' . DS . 'View.php' : '';
     if ($ReturnContent == true)
-        return (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = true) )->Content();
+        return (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = true))->Content();
     else
         echo (new View($File, ($D ?: []), $ReturnContent, $IsForSytem = true))->Render();
     return '';
 }
 
-function GetClassVariableValue($CN = null, $Var = null) {
+function GetClassVariableValue($CN = null, $Var = null)
+{
 
 
     if (class_exists($CN)) {
@@ -97,43 +108,33 @@ function GetClassVariableValue($CN = null, $Var = null) {
     }
 }
 
-function SubDomain() {
-    // Get the HTTP host
+function SubDomain()
+{
     $host = $_SERVER['HTTP_HOST'];
-    // Split the host into parts
     $parts = explode('.', $host);
-
-    // Check if we have enough parts for subdomains
-    if (count($parts) >= 3) {
-        // Return the subdomain (first part)
-        return strtolower($parts[0]);
-    }
-
-    // Return null if there is no valid subdomain
-    return null;
+    if (env('AppIsHostedOnSubDomain') == true)
+        return isset($parts[0]) && isset($parts[1]) && count($parts) === 4 ? strtolower($parts[0]) : null;
+    else
+        return isset($parts[0]) && count($parts) === 3 ? strtolower($parts[0]) : null;
 }
 
-function BaseDomain() {
-    // Get the HTTP host
+function BaseDomain()
+{
     $host = $_SERVER['HTTP_HOST'];
-    // Split the host into parts
     $parts = explode('.', $host);
-
-    // Check if we have at least 2 parts for the base domain
-    if (count($parts) >= 2) {
-        // Return the base domain
-        return strtolower($parts[count($parts) - 2] . '.' . $parts[count($parts) - 1]);
-    }
-
-    // Return null if there is no valid base domain
-    return null;
+    if (env('AppIsHostedOnSubDomain') == true)
+        return isset($parts[1]) && isset($parts[2]) ? strtolower(!empty(SubDomain()) ? ($parts[2] . '.' . $parts[3]) : ($parts[1] . '.' . $parts[2])) : null;
+    else
+        return isset($parts[1]) ? strtolower(!empty(SubDomain()) ? ($parts[1] . '.' . $parts[2]) : ($parts[0] . '.' . $parts[1])) : null;
 }
 
-function Domain() {
+function Domain()
+{
     return $_SERVER['HTTP_HOST'];
 }
 
-function ClientIP($IPV6 = true) {
+function ClientIP($IPV6 = true)
+{
     if ($IPV6 == true)
         return filter_var(ClientIP(false), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ?: ClientIP(false);
     else {
@@ -146,7 +147,8 @@ function ClientIP($IPV6 = true) {
     }
 }
 
-function Client() {
+function Client()
+{
     $UserAgent = $_SERVER['HTTP_USER_AGENT'];
     if (preg_match('/(Chrome|Firefox|Safari|Opera|Edge|IE)\/([\d.]+)/', $UserAgent, $M)) {
         $Browser = $M[1];
@@ -186,8 +188,8 @@ function Client() {
 
 
 
-            
-// Determine bitness based on specific iOS devices and architectures
+
+        // Determine bitness based on specific iOS devices and architectures
         // ...
     } else {
         $Platform = 'NA';
@@ -205,13 +207,15 @@ function Client() {
     ];
 }
 
-function GenerateUniqueID($MaxLen = 16): string { // Max Len 32 // Don't cahnge in feture
+function GenerateUniqueID($MaxLen = 16): string
+{ // Max Len 32 // Don't cahnge in feture
     $Lenght = $MaxLen > 32 ? 32 : $MaxLen;
-    $UUID = (random_int(1111, 9999) . random_int(111, 999) . (((int) str_replace('.', '', $_SERVER['REMOTE_ADDR'])) % 10000 ) . ((int) str_replace('.', '', microtime(true)) % 1000000)) . ( $Lenght > 16 ? GenerateUniqueID(16) : '');
+    $UUID = (random_int(1111, 9999) . random_int(111, 999) . (((int) str_replace('.', '', $_SERVER['REMOTE_ADDR'])) % 10000) . ((int) str_replace('.', '', microtime(true)) % 1000000)) . ($Lenght > 16 ? GenerateUniqueID(16) : '');
     return substr($UUID, 0, $Lenght); // Note - never set (int) for this return because it's always same no unique 
 }
 
-function GenerateUUID(): string {
+function GenerateUUID(): string
+{
 
     $uuid = Ramsey\Uuid\Uuid::uuid4()->toString();
     return substr($uuid, 0, $length);
@@ -225,7 +229,8 @@ function GenerateUUID(): string {
     return $uniqueId;
 }
 
-function ArrayToString($array) {
+function ArrayToString($array)
+{
     $string = '';
     foreach ($array as $key => $value) {
         $string .= "$key: $value, ";
@@ -233,7 +238,8 @@ function ArrayToString($array) {
     return rtrim($string, ', '); // Remove the trailing comma and space
 }
 
-function set_subdomain_cookie($name, $value, $expire, $path, $domain, $secure = false, $httponly = false) {
+function set_subdomain_cookie($name, $value, $expire, $path, $domain, $secure = false, $httponly = false)
+{
     $subdomain = SubDomain();
     $cookie_name = $subdomain . '_' . $name;
     setcookie($cookie_name, $value, $expire, $path, $domain, $secure, $httponly);
@@ -242,7 +248,8 @@ function set_subdomain_cookie($name, $value, $expire, $path, $domain, $secure = 
     ini_set('session.use_only_cookies', true);
 }
 
-function start_subdomain_session() {
+function start_subdomain_session()
+{
     $subdomain = SubDomain();
     session_name($subdomain . '_session_id');
     session_start();
@@ -251,7 +258,8 @@ function start_subdomain_session() {
 
 
 // Set up a global exception handler
-function GlobalExceptionInit(Throwable $E) {
+function GlobalExceptionInit(Throwable $E)
+{
     dd('Call ================= Global Exception Handler function - From Exc Class =  ' . get_class($E));
     if ($E instanceof PDOException) {
         try {
@@ -298,22 +306,24 @@ function GlobalExceptionInit(Throwable $E) {
     SaveErrorLogFile($E, get_class($E));
 }
 
-function SaveErrorLogFile($E, $EClassName = null) {
+function SaveErrorLogFile($E, $EClassName = null)
+{
     //error_log($Msg, E_ERROR, $ErrorFile, 2); // issue with SMTP is reuired
-    $Msg = ('TID-' . (( TraceID !== null ) ? TraceID: '') . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
-    $ErrorFile = ( TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/' . date('Y-m-d')) . '.log';
-//is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
-echo is_dir($ErrorFile) ? 'dir available': 'dir not available';
-    file_exists($ErrorFile) ?'' : touch($ErrorFile);
+    $Msg = ('TID-' . ((TraceID !== null) ? TraceID : '') . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
+    $ErrorFile = (TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/' . date('Y-m-d')) . '.log';
+    //is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
+    echo is_dir($ErrorFile) ? 'dir available' : 'dir not available';
+    file_exists($ErrorFile) ? '' : touch($ErrorFile);
     file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
 }
 
-function SaveAccessLogFile($Browser) {
+function SaveAccessLogFile($Browser)
+{
     //error_log($Msg, E_ERROR, $ErrorFile, 2); // issue with SMTP is reuired
     $C = Client();
     $Msg = ('TID-' . TraceID . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] Req-' . $_SERVER['REQUEST_METHOD'] . ' URI ' . $_SERVER['REQUEST_URI'] . ' IP-' . $C['IP'] . ' ' . $C['Browser'] . '#' . $C['Version'] . ' ' . $C['Platform'] . '#' . $C['PlatformVersion'] . '-' . $C['Bitness']) . '||';
-    $ErrorFile = ( TenantBaseDir . $_SERVER['Tenant']['ID'] . '/AccessLog/' . date('Y-m-d')) . '.log';
-//is_dir($ErrorFile) ?: throw new SystemExc('AccessLog Directory is not found');
+    $ErrorFile = (TenantBaseDir . $_SERVER['Tenant']['ID'] . '/AccessLog/' . date('Y-m-d')) . '.log';
+    //is_dir($ErrorFile) ?: throw new SystemExc('AccessLog Directory is not found');
     file_exists($ErrorFile) ?: touch($ErrorFile);
     file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
 }
