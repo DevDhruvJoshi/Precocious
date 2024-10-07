@@ -113,10 +113,12 @@ class DB
      */
     public function CheckDBExisted($dbName)
     {
+        if(!empty($dbName)){
         $sql = "SHOW DATABASES LIKE ?";
         $stmt = $this->Connection->prepare($sql);
         $stmt->execute([$dbName]);
         return $stmt->rowCount() > 0;
+        }
     }
 
 
