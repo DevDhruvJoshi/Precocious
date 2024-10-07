@@ -48,7 +48,6 @@ class Tenant extends \System\App\Tenant\Base
         $validator = new SystemValidator($db);
 
 
-
         // Here you can run any setup code as needed
         // For example, setting up the owner and tenant
         try {
