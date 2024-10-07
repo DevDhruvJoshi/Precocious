@@ -55,7 +55,7 @@ class Tenant extends \System\App\Tenant\Base
             $db = new DB();
             $ownerService = new OwnerService($validator, $db);
             $ownerService->ensureOwnerExists('Owner Name',env('OwnerSubDomain'));
-            echo "Owner setup completed successfully.\n";
+            //echo "Owner setup completed successfully.\n";
 
             // Setup tenant (example)
             if (!empty(SubDomain()) && 1 == 2) {
