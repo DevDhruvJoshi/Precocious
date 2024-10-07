@@ -33,42 +33,38 @@ class DB
                 if (!empty($Host) && !empty($Name)) {
                     $this->Type = $Type;
                     $this->Host = $Host;
-                    $this->DB = $Name;
+                    $this->DB = $Name; // This can be empty
                     $this->User = $User;
                     $this->Password = $Password;
                 } else if (!empty(SubDomain())) {
                     $Tenant = Tenant::DBCredencial(SubDomain());
                     $this->Type = $Tenant['DB_Type'];
                     $this->Host = $Tenant['DB_Host'];
-                    $this->DB = $Tenant['DB_Name'];
+                    $this->DB = $Tenant['DB_Name']; // This can also be empty
                     $this->User = $Tenant['DB_User'];
                     $this->Password = $Tenant['DB_Password'];
                 }
             } else {
                 $this->Type = env('DB_Type');
                 $this->Host = env('DB_Host');
-                $this->DB = env('DB_Name');
+                $this->DB = env('DB_Name'); // This can also be empty
                 $this->User = env('DB_User');
                 $this->Password = env('DB_Password');
             }
     
-            // Establish the connection without selecting a specific database
+            // Establish the connection without specifying a database
             $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
             $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-            // Check if the database name is set and if it exists
+            // If a database name is provided, check if it exists
             if (!empty($this->DB)) {
                 if ($this->CheckDBExisted($this->DB)) {
                     // If the database exists, use it
                     $this->UseDB();
-                } else {
-                    // If the database does not exist, create it
-                    $this->CreateDB($this->DB);
-                    $this->UseDB(); // Select the newly created database
                 }
+                // If it doesn't exist, do nothing
+                // You can optionally log or handle this case if needed
             }
-            // If $this->DB is empty, simply continue without trying to use a database
-    
         } catch (PDOException $E) {
             throw new DBExc($E->getMessage(), $E->getCode(), $E);
         } catch (Exception $e) {
