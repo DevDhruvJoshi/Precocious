@@ -59,13 +59,14 @@ class DB
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 
 
-
+                dd($this->CheckDBExisted($this->DB));   
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB)) {
                     dd('selectio of DB' . $this->DB);
                     $this->UseDB();
                     $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 } else {
+
                     //$this->CreateDB($this->DB); // Create the database if it does not exist
                     //$this->UseDB(); // Now select the newly created database
                 }
