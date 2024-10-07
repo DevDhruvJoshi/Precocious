@@ -98,15 +98,35 @@ function GetClassVariableValue($CN = null, $Var = null) {
 }
 
 function SubDomain() {
+    // Get the HTTP host
     $host = $_SERVER['HTTP_HOST'];
+    // Split the host into parts
     $parts = explode('.', $host);
-    return isset($parts[0]) && count($parts) === 3 ? strtolower($parts[0]) : null;
+
+    // Check if we have enough parts for subdomains
+    if (count($parts) >= 3) {
+        // Return the subdomain (first part)
+        return strtolower($parts[0]);
+    }
+
+    // Return null if there is no valid subdomain
+    return null;
 }
 
 function BaseDomain() {
+    // Get the HTTP host
     $host = $_SERVER['HTTP_HOST'];
+    // Split the host into parts
     $parts = explode('.', $host);
-    return isset($parts[1]) ? strtolower(!empty(SubDomain()) ? ($parts[1] . '.' . $parts[2]) : ($parts[0] . '.' . $parts[1])) : null;
+
+    // Check if we have at least 2 parts for the base domain
+    if (count($parts) >= 2) {
+        // Return the base domain
+        return strtolower($parts[count($parts) - 2] . '.' . $parts[count($parts) - 1]);
+    }
+
+    // Return null if there is no valid base domain
+    return null;
 }
 
 function Domain() {
