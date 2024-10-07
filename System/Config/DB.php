@@ -28,54 +28,36 @@ class DB
 
     public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null)
     {
-        try {
 
-            if (Tenant::Permission() == true) {
-                if (!empty($Host) && !empty($Name)) {
-                    $this->Type = $Type;
-                    $this->Host = $Host;
-                    $this->DB = $Name;
-                    $this->User = $User;
-                    $this->Password = $Password;
-                } else if (!empty(SubDomain())) {
-                    $Tenant = (Tenant::DBCredencial(SubDomain()));
-                    $this->Type = $Tenant['DB_Type'];
-                    $this->Host = $Tenant['DB_Host'];
-                    $this->DB = $Tenant['DB_Name'];
-                    $this->User = $Tenant['DB_User'];
-                    $this->Password = $Tenant['DB_Password'];
-                }
-            } else {
-                $this->Type = env('DB_Type');
-                $this->Host = env('DB_Host');
-                $this->DB = env('DB_Name');
-                $this->User = env('DB_User');
-                $this->Password = env('DB_Password');
+        if (Tenant::Permission() == true) {
+            if (!empty($Host) && !empty($Name)) {
+                $this->Type = $Type;
+                $this->Host = $Host;
+                $this->DB = $Name;
+                $this->User = $User;
+                $this->Password = $Password;
+            } else if (!empty(SubDomain())) {
+                $Tenant = (Tenant::DBCredencial(SubDomain()));
+                $this->Type = $Tenant['DB_Type'];
+                $this->Host = $Tenant['DB_Host'];
+                $this->DB = $Tenant['DB_Name'];
+                $this->User = $Tenant['DB_User'];
+                $this->Password = $Tenant['DB_Password'];
             }
+        } else {
+            $this->Type = env('DB_Type');
+            $this->Host = env('DB_Host');
+            $this->DB = env('DB_Name');
+            $this->User = env('DB_User');
+            $this->Password = env('DB_Password');
+        }
 
 
-            if (($Type = trim(strtolower($this->Type))) == 'mysql') {
-
-                try {
-                    $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
-                    $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
-                        $this->UseDB();
-                    } else {
-
-                        //$this->CreateDB($this->DB); // Create the database if it does not exist
-                        //$this->UseDB(); // Now select the newly created database
-                    }
-                    echo "Connection successful!";
-                } catch (PDOException $E) {
-                    throw new DBExc($E->getMessage(), $E->getCode(), $E);
-
-                }
-
+        if (($Type = trim(strtolower($this->Type))) == 'mysql') {
+            try {
                 //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
                     $this->UseDB();
                 } else {
@@ -83,15 +65,13 @@ class DB
                     //$this->CreateDB($this->DB); // Create the database if it does not exist
                     //$this->UseDB(); // Now select the newly created database
                 }
+                echo "Connection successful!";
+            } catch (PDOException $E) {
+                throw new DBExc($E->getMessage(), $E->getCode(), $E);
 
-
-            } else
-                throw new SystemExc("Unsupported database type: " . $this->Type);
-        } catch (PDOException $E) {
-            throw new DBExc($E->getMessage(), $E->getCode(), $E);
-        } catch (Exception $e) {
-            throw new DBExc($e->getMessage(), $e->getCode(), $e);
-        }
+            }
+        } else
+            throw new SystemExc("Unsupported database type: " . $this->Type);
     }
 
     /**
