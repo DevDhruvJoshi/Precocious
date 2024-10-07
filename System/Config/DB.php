@@ -57,15 +57,12 @@ class DB
             if (($Type = trim(strtolower($this->Type))) == 'mysql') {
                 //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
-                
+                $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                dd($this->CheckDBExisted($this->DB));   
-                if (!empty($this->DB) && $this->CheckDBExisted($this->DB)) {
-                    dd('selectio of DB' . $this->DB);
-                    $this->UseDB();
-                    $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+                if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
+                    $this->UseDB(); 
                 } else {
+                    return $this->Connection;
 
                     //$this->CreateDB($this->DB); // Create the database if it does not exist
                     //$this->UseDB(); // Now select the newly created database
