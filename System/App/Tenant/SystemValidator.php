@@ -16,6 +16,7 @@ class SystemValidator {
     }
 
     public function checkOwnerExists(string $ownerDbName) {
+        dd('alksd');
         $this->createDatabaseIfNotExists($ownerDbName); // Ensure owner DB exists
 
         // Check if the Tenants table exists in the owner database

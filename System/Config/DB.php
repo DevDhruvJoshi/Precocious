@@ -62,7 +62,7 @@ class DB
                 dd($this->ListAll());
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
                     $this->UseDB();
-                    dd('Use DB '.$this->DB);
+                    dd('Use DB ' . $this->DB);
                 } else {
                     if ($WantToCreateDB === true) {
                         $this->CreateDB($this->DB); // Create the database if it does not exist
@@ -86,30 +86,29 @@ class DB
         try {
             $this->Connection->exec("USE `$this->DB`");
         } catch (PDOException $E) {
-            // Ensure that DBExc is properly defined and can accept a message
+
             throw new DBExc($E->getMessage(), $E->getCode(), $E);
         }
     }
 
     public function ListAll()
-{
-    $databases = [];
+    {
+        $databases = [];
 
-    try {
-        // Prepare the SQL query to list all databases
-        $sql = "SHOW DATABASES";
-        $stmt = $this->Connection->prepare($sql);
-        $stmt->execute();
+        try {
+            // Prepare the SQL query to list all databases
+            $sql = "SHOW DATABASES";
+            $stmt = $this->Connection->prepare($sql);
+            $stmt->execute();
 
-        // Fetch all database names
-        $databases = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    } catch (PDOException $E) {
-        // Ensure that DBExc is properly defined and can accept a message
-        throw new DBExc($E->getMessage(), $E->getCode(), $E);
+            // Fetch all database names
+            $databases = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (PDOException $E) {
+            throw new DBExc($E->getMessage(), $E->getCode(), $E);
+        }
+
+        return $databases; // Return the list of databases
     }
-
-    return $databases; // Return the list of databases
-}
 
 
 
