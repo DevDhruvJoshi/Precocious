@@ -26,7 +26,7 @@ class DB
     private $Password = '';
     public $Connection;
 
-    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null)
+    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null, $WantToCreateDB = false)
     {
 
         if (Tenant::Permission() == true) {
@@ -61,14 +61,13 @@ class DB
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
                     $this->UseDB();
                 } else {
-
-                    //$this->CreateDB($this->DB); // Create the database if it does not exist
-                    //$this->UseDB(); // Now select the newly created database
+                    if ($WantToCreateDB === true) {
+                        $this->CreateDB($this->DB); // Create the database if it does not exist
+                        $this->UseDB(); // Now select the newly created database
+                    }
                 }
-                echo "Connection successful!";
             } catch (PDOException $E) {
                 throw new DBExc($E->getMessage(), $E->getCode(), $E);
-
             }
         } else
             throw new SystemExc("Unsupported database type: " . $this->Type);
