@@ -28,9 +28,6 @@ class DB
 
     public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null, $WantToCreateDB = false)
     {
-        dd(SubDomain());
-        dd(Domain());
-        dd(BaseDomain());
 
         if (Tenant::Permission() == true) {
             if (!empty($Host) && !empty($Name)) {
