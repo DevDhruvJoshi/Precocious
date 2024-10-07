@@ -58,6 +58,8 @@ class DB
 
                 try {
                     $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+                    if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
+                    }
                     echo "Connection successful!";
                 } catch (PDOException $E) {
                     throw new DBExc($E->getMessage(), $E->getCode(), $E);
