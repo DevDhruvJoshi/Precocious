@@ -59,8 +59,9 @@ class DB
                 try {
                     $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                     echo "Connection successful!";
-                } catch (PDOException $e) {
-                    echo "Connection failed: " . $e->getMessage();
+                } catch (PDOException $E) {
+                    throw new DBExc($E->getMessage(), $E->getCode(), $E);
+
                 }
 
                 //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
