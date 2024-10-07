@@ -43,6 +43,12 @@ class DB
                 $this->DB = $Tenant['DB_Name'];
                 $this->User = $Tenant['DB_User'];
                 $this->Password = $Tenant['DB_Password'];
+            } else { // Start - after add this please confirm its want here or not if not so please remove 
+                $this->Type = env('DB_Type');
+                $this->Host = env('DB_Host');
+                $this->DB = env('DB_Name');
+                $this->User = env('DB_User');
+                $this->Password = env('DB_Password');// End - after add this please confirm its want here or not if not so please remove 
             }
         } else {
             $this->Type = env('DB_Type');
