@@ -25,53 +25,64 @@ class DB
     private $User = 'root';
     private $Password = '';
     public $Connection;
+
     public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null)
     {
         try {
-            // Set up connection parameters based on tenant permissions or environment variables
+
             if (Tenant::Permission() == true) {
                 if (!empty($Host) && !empty($Name)) {
                     $this->Type = $Type;
                     $this->Host = $Host;
-                    $this->DB = $Name; // This can be empty
+                    $this->DB = $Name;
                     $this->User = $User;
                     $this->Password = $Password;
                 } else if (!empty(SubDomain())) {
-                    $Tenant = Tenant::DBCredencial(SubDomain());
+                    $Tenant = (Tenant::DBCredencial(SubDomain()));
                     $this->Type = $Tenant['DB_Type'];
                     $this->Host = $Tenant['DB_Host'];
-                    $this->DB = $Tenant['DB_Name']; // This can also be empty
+                    $this->DB = $Tenant['DB_Name'];
                     $this->User = $Tenant['DB_User'];
                     $this->Password = $Tenant['DB_Password'];
                 }
             } else {
                 $this->Type = env('DB_Type');
                 $this->Host = env('DB_Host');
-                $this->DB = env('DB_Name'); // This can also be empty
+                $this->DB = env('DB_Name');
                 $this->User = env('DB_User');
                 $this->Password = env('DB_Password');
             }
-    
-            // Establish the connection without specifying a database
-            $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
-            $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-            // If a database name is provided, check if it exists
-            if (!empty($this->DB)) {
-                if ($this->CheckDBExisted($this->DB)) {
-                    // If the database exists, use it
-                    $this->UseDB();
-                }
-                // If it doesn't exist, do nothing
-                // You can optionally log or handle this case if needed
+            try {
+                $pdo = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+                echo "Connection successful!";
+            } catch (PDOException $e) {
+                echo "Connection failed: " . $e->getMessage();
             }
+
+            if (($Type = trim(strtolower($this->Type))) == 'mysql') {
+                //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
+                $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+                $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+                if (!empty($this->DB) && $this->CheckDBExisted($this->DB)) {
+                    dd('selectio of DB' . $this->DB);
+                    $this->UseDB();
+
+                } else {
+                    //$this->CreateDB($this->DB); // Create the database if it does not exist
+                    //$this->UseDB(); // Now select the newly created database
+                }
+
+
+            } else
+                throw new SystemExc("Unsupported database type: " . $this->Type);
         } catch (PDOException $E) {
             throw new DBExc($E->getMessage(), $E->getCode(), $E);
         } catch (Exception $e) {
             throw new DBExc($e->getMessage(), $e->getCode(), $e);
         }
     }
-    
 
     /**
      * Use a specific database after establishing a connection.
