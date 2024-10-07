@@ -30,6 +30,7 @@ class DB
     {
         dd(SubDomain());
         dd(Domain());
+        dd(BaseDomain());
 
         if (Tenant::Permission() == true) {
             if (!empty($Host) && !empty($Name)) {
