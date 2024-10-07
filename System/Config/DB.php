@@ -118,10 +118,11 @@ class DB
                 $stmt = $this->Connection->prepare($sql);
                 $stmt->execute([$dbName]);
                 $exists = $stmt->rowCount() > 0; // Set exists to true if a database is found
-            } catch (PDOException $e) {
+            } catch (PDOException $E) {
                 // Log the error or handle it as needed
                 // For example, log the error without throwing it to prevent stopping execution
-                error_log("Error checking database existence: " . $e->getMessage());
+                throw new DBExc($E->getMessage(), $E->getCode(), $E);
+                //error_log("Error checking database existence: " . $e->getMessage());
             }
         }
     
