@@ -113,8 +113,9 @@ function SubDomain()
     $host = $_SERVER['HTTP_HOST'];
     $parts = explode('.', $host);
     dd($parts);
+    
     if (env('AppIsHostedOnSubDomain') == true)
-        return isset($parts[0]) && isset($parts[1]) && count($parts) === 4 ? strtolower($parts[0]) : null;
+        return isset($parts[0]) && count($parts) === 4 ? strtolower($parts[0]) : null;
     else
         return isset($parts[0]) && count($parts) === 3 ? strtolower($parts[0]) : null;
 }
