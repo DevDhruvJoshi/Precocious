@@ -59,6 +59,7 @@ class DB
                 $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
                 $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 dd($this->DB);
+                dd($this->ListAll());
                 if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
                     $this->UseDB();
                     dd('Use DB '.$this->DB);
