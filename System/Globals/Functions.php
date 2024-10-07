@@ -124,7 +124,8 @@ function BaseDomain()
     $host = $_SERVER['HTTP_HOST'];
     $parts = explode('.', $host);
     if (env('AppIsHostedOnSubDomain') == true)
-        return isset($parts[1]) && isset($parts[2]) ? strtolower(!empty(SubDomain()) ? ($parts[2] . '.' . $parts[3]) : ($parts[1] . '.' . $parts[2])) : null;
+        return isset($parts[1]) && isset($parts[2]) ?
+     strtolower(!empty(SubDomain()) ? ($parts[1] . '.' . $parts[2] . '.' . $parts[3]) : ($parts[0] . '.' . $parts[1] . '.' . $parts[2])) : null;
     else
         return isset($parts[1]) ? strtolower(!empty(SubDomain()) ? ($parts[1] . '.' . $parts[2]) : ($parts[0] . '.' . $parts[1])) : null;
 }
