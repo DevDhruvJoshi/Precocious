@@ -23,6 +23,7 @@ class OwnerService {
 
     private function createOwner($ownerName, $subDomain) {
         // Create the owner in the database
+        dd('        // Create the owner in the database');
         $this->db->Insert('Tenants', [
             'ID' => 1,
             'Name' => $ownerName,

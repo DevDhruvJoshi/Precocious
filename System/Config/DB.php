@@ -63,7 +63,7 @@ class DB
         }
 
 
-        dd($this->Type);
+        dd('DBType ='.$this->Type);
         if (($Type = trim(strtolower($this->Type))) == 'mysql') {
             try {
                 //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
