@@ -36,6 +36,7 @@ class DB
                 $this->DB = $Name;
                 $this->User = $User;
                 $this->Password = $Password;
+                dd('custom credencial');
             } else if (!empty(SubDomain())) {
                 $Tenant = (Tenant::DBCredencial(SubDomain()));
                 $this->Type = $Tenant['DB_Type'];
@@ -43,12 +44,14 @@ class DB
                 $this->DB = $Tenant['DB_Name'];
                 $this->User = $Tenant['DB_User'];
                 $this->Password = $Tenant['DB_Password'];
+                dd('subdomain tenant credencial');
             } else { // Start - after add this please confirm its want here or not if not so please remove 
                 $this->Type = env('DB_Type');
                 $this->Host = env('DB_Host');
                 $this->DB = env('DB_Name');
                 $this->User = env('DB_User');
                 $this->Password = env('DB_Password');// End - after add this please confirm its want here or not if not so please remove 
+                dd('subdomain env credencial');
             }
         } else {
             $this->Type = env('DB_Type');
@@ -56,6 +59,7 @@ class DB
             $this->DB = env('DB_Name');
             $this->User = env('DB_User');
             $this->Password = env('DB_Password');
+            dd('subdomain env notmultytenancy credencial');
         }
 
 
