@@ -53,6 +53,7 @@ class Tenant extends \System\App\Tenant\Base
         try {
             // Setup owner (example)
             $db = new DB();
+            dd('now check owner are existed or create');
             $ownerService = new OwnerService($validator, $db);
             $ownerService->ensureOwnerExists('Owner Name',env('OwnerSubDomain'));
             //echo "Owner setup completed successfully.\n";
