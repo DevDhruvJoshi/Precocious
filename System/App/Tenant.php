@@ -44,7 +44,7 @@ class Tenant extends \System\App\Tenant\Base
         // Initialize your DB instance
 
         $db = new DB();
-        dd($db->ListAll());
+        //dd($db->ListAll());
         $validator = new SystemValidator($db);
 
 

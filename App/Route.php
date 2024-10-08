@@ -5,7 +5,7 @@ use System\Preload\Precocious;
 use App\Model\Contact;
 
 Route::Get('/', function () {
-    echo "This is the home route";
+    echo "This is the basic route home";
     dd(Contact::All([], ['ID' => 'desc'], false));
 });
 
