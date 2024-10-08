@@ -63,11 +63,6 @@ class SystemValidator
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
         ";
 
-        $OwnerRow = "
-        INSERT INTO Tenants (Name,SubDomain,Status,DB_Type,DB_Host,DB_Name,DB_User,DB_Password,Deleted)
-            VALUES ('Owner Management','$this->db->Type',1,'MySql','localhost','Owner','server','Server@123',0);
-        ";
-
         $this->db->Connection->exec("USE `$dbName`");
         $this->db->Connection->exec($createTableSQL);
     }
