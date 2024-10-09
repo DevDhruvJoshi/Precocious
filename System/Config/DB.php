@@ -44,6 +44,7 @@ class DB
                 $this->DB = $Tenant['DB_Name'];
                 $this->User = $Tenant['DB_User'];
                 $this->Password = $Tenant['DB_Password'];
+                dd($Tenant);
                 dd('subdomain tenant credencial');
             } else { // Start - after add this please confirm its want here or not if not so please remove 
                 $this->Type = env('DB_Type');
