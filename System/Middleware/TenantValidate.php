@@ -4,6 +4,7 @@ namespace System\Config;
 
 use PDO;
 use System\App\Tenant;
+use System\Concurrency\ThreadPool;
 use System\Preload\SystemExc;
 
 class TenantValidate
@@ -73,6 +74,9 @@ class TenantValidate
 
     private function executeSteps(array $steps, bool $IsCritical = false): void
     {
+        if ($IsCritical)
+            $ThreadPool = new ThreadPool(5); // for example, max 5 concurrent tasks
+
         foreach ($steps as $step => $stepDescription) {
             try {
                 $methodName = 'step' . $step;
@@ -88,6 +92,9 @@ class TenantValidate
                 throw new SystemExc("Validation failed at step $step ($stepDescription): " . $e->getMessage());
             }
         }
+        if ($IsCritical)
+            $ThreadPool->wait(); // Wait for all tasks to complete
+
     }
 
     private function step1(): void
