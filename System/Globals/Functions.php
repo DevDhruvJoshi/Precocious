@@ -33,7 +33,7 @@ function dd($V, $E = 0)
 
 function env(string $K)
 {
-    return isset($K) ? (isset($_ENV[$K]) ? $_ENV[$K] : throw new SystemExc('not found '.$K .' in env file')) : null;
+    return isset($K) ? (isset($_ENV[$K]) ? ($K == 'OwnerSubDomain' ? strtolower($_ENV[$K]): $_ENV[$K]) : throw new SystemExc('not found '.$K .' in env file')) : null;
 }
 
 function FuncCallFrom()

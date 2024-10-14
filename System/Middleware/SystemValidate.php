@@ -204,7 +204,7 @@ class SystemValidate
     private function CreateEnvFile(string $EnvFilePath): void
     {
         $envConfig = [
-            'OwnerSubDomain' => 'Owner',
+            'OwnerSubDomain' => strtolower('owner'),
             'OwnerDB_Type' => env('DB_Type'),
             'OwnerDB_Host' => env('DB_Host'),
             'OwnerDB_Name' => self::OwnerDBPrefix . env('DB_Name'),
