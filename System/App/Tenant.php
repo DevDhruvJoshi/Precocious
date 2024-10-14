@@ -156,7 +156,8 @@ class Tenant extends \System\App\Tenant\Base
                 'Status' => 1,
                 'DB_Type' => env('DB_Type'),
                 'DB_Host' => env('DB_Host'),
-                'DB_Name' => env('DB_Name') . rand(111, 999),
+                'DB_Name' => $Name = env('DB_Name') . rand(111, 999),
+                'Name' => $Name,
                 'DB_User' => env('DB_User'),
                 'DB_Password' => env('DB_Password'),
             ]);
