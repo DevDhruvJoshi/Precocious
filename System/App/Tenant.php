@@ -147,6 +147,22 @@ class Tenant extends \System\App\Tenant\Base
         return !empty(SubDomain()) && self::IsOwner() != true ? true : false;
     }
 
+    static function AddNew(string $SubDomain = '')
+    {
+
+        if (!empty($SubDomain))
+            return self::Save([
+                'SubDomain' => strtolower($SubDomain),
+                'Active' => 1,
+                'Status' => 1,
+                'DB_Type' => env('DB_Type'),
+                'DB_Host' => env('DB_Host'),
+                'DB_Name' => env('DB_Name') . rand(111, 999),
+                'DB_User' => env('DB_User'),
+                'DB_Password' => env('DB_Password'),
+            ]);
+    }
+
 
 
 }
