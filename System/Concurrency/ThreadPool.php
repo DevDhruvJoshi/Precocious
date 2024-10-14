@@ -34,7 +34,7 @@ class ThreadPool
 
 class Worker
 {
-    private callable $task;
+    private $task; // Changed from callable to mixed
     private $process;
 
     public function __construct(callable $task)
@@ -44,7 +44,9 @@ class Worker
 
     public function start(): void
     {
-        $this->process = popen('php -r ' . escapeshellarg($this->task), 'r');
+        // Use closure serialization if the task is callable
+        $taskString = serialize($this->task);
+        $this->process = popen('php -r ' . escapeshellarg("unserialize(" . var_export($taskString, true) . ");"), 'r');
     }
 
     public function join(): void
