@@ -1,0 +1,56 @@
+<?php
+
+namespace System\Concurrency;
+
+use Exception;
+
+class ThreadPool
+{
+    private array $workers = [];
+    private int $maxWorkers;
+
+    public function __construct(int $maxWorkers)
+    {
+        $this->maxWorkers = $maxWorkers;
+    }
+
+    public function submit(callable $task): void
+    {
+        if (count($this->workers) >= $this->maxWorkers) {
+            throw new Exception("Maximum worker limit reached.");
+        }
+
+        $this->workers[] = new Worker($task);
+        $this->workers[count($this->workers) - 1]->start();
+    }
+
+    public function wait(): void
+    {
+        foreach ($this->workers as $worker) {
+            $worker->join();
+        }
+    }
+}
+
+class Worker
+{
+    private callable $task;
+    private $process;
+
+    public function __construct(callable $task)
+    {
+        $this->task = $task;
+    }
+
+    public function start(): void
+    {
+        $this->process = popen('php -r ' . escapeshellarg($this->task), 'r');
+    }
+
+    public function join(): void
+    {
+        if ($this->process) {
+            pclose($this->process);
+        }
+    }
+}

@@ -1,4 +1,6 @@
-<?php namespace System\Config;
+<?php
+
+namespace System\Concurrency;
 
 use System\Preload\PromiseExc;
 

@@ -5,6 +5,7 @@ namespace System\Middleware;
 use PDO;
 use Symfony\Component\Dotenv\Dotenv;
 use System\App\Tenant;
+use System\Concurrency\ThreadPool;
 use System\Config\Credential;
 use System\Config\DB;
 use System\Preload\SystemExc;
@@ -110,6 +111,7 @@ class SystemValidate
     {
         $this->CheckDatabaseCredentials();
         $this->CheckDatabaseConnection();
+        $threadPool = new ThreadPool(5); // for example, max 5 concurrent tasks
 
         foreach (self::STEPS as $Step => $Description) {
             $MethodName = 'Step' . $Step;
@@ -122,6 +124,7 @@ class SystemValidate
                 }
             }
         }
+        $threadPool->wait(); // Wait for all tasks to complete
     }
 
     private function Step3(): bool
