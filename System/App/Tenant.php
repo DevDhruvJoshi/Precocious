@@ -153,7 +153,6 @@ class Tenant extends \System\App\Tenant\Base
         if (!empty($SubDomain))
             return self::Save([
                 'SubDomain' => strtolower($SubDomain),
-                'Active' => 1,
                 'Status' => 1,
                 'DB_Type' => env('DB_Type'),
                 'DB_Host' => env('DB_Host'),
