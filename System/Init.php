@@ -37,9 +37,9 @@ class Init
 
         if (file_exists(Root . '.env')) {
             $dotenv = new Dotenv();
-            $dotenv->load(Root . '/.env');
+            $dotenv->load($df= Root . ($_SERVER['SERVER_ADDR'] == '127.0.0.1' ? '/.env.local': '/.env'));
             /* this is a easy way to load file without DotEnv class if you want to not using please use this code  */
-            $_ENV = parse_ini_file(Root . '.env');
+            //$_ENV = parse_ini_file(Root . '.env');
             /* */
         } else
             throw new SystemExc(".env file not found. please make sure file is correct path");
