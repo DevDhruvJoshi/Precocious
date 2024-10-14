@@ -9,9 +9,11 @@ use System\App\Session;
 class Precocious
 {
 
+
     public function __construct($URL = '')
     {
-        (Tenant::Init());
+
+        //(Tenant::Init());
         (new Session())->Init();
         sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
         sdd(' call From-' . FuncCallFrom());
@@ -28,6 +30,7 @@ class Precocious
 
         define('Controller', (trim(trim($U[0]), DS)) ?: 'Home');
         define('Method', (isset($U[1]) && $U[1] ? $U[1] : 'Index'));
+
     }
 
     static function Install($ErrorCode = null)
@@ -69,8 +72,10 @@ class Precocious
 
     public function DomainConfig()
     {
+        if (Tenant::IsOwner() == true)
+            define('TenantID', 1);
         if (Tenant::Permission() === true) {
-            if (!empty(SubDomain()) && Tenant::IsVerified()) {
+            if (!empty(SubDomain())) {
 
             }
         } elseif (Tenant::Permission() === false && !empty(SubDomain())) {
@@ -79,7 +84,7 @@ class Precocious
         } elseif (Tenant::Permission() === false && empty(SubDomain())) {
             $_SERVER['Tenant']['ID'] = 0;
             $_SERVER['Tenant']['Name'] = 0;
-            define(TenantID, 0);
+            define('TenantID', 0);
         } else {
         }
     }

@@ -19,70 +19,77 @@ use System\Preload\SystemExc;
 class DB
 {
 
+    private static $instance = null; // Singleton instance
+    private static $connectionPool = []; // Connection pool
+
     private $Type = 'MySql';
     private $Host = 'localhost';
     private $DB = 'DMVC';
     private $User = 'root';
     private $Password = '';
+
+    private $CredentialID = null;
     public $Connection;
 
-    public function __construct($Host = null, $Name = null, $User = null, $Password = null, $Type = null, $WantToCreateDB = false)
+    public function __construct(array $Credential = null, bool $WantToCreateDB = false)
     {
-
-        if (Tenant::Permission() == true) {
-            if (!empty($Host) && !empty($Name)) {
-                $this->Type = $Type;
-                $this->Host = $Host;
-                $this->DB = $Name;
-                $this->User = $User;
-                $this->Password = $Password;
-                dd('custom credencial');
-            } else if (!empty(SubDomain())) {
-                $Tenant = (Tenant::DBCredencial(SubDomain()));
-                $this->Type = $Tenant['DB_Type'];
-                $this->Host = $Tenant['DB_Host'];
-                $this->DB = $Tenant['DB_Name'];
-                $this->User = $Tenant['DB_User'];
-                $this->Password = $Tenant['DB_Password'];
-                dd($Tenant);
-                dd('subdomain tenant credencial');
-            } else { // Start - after add this please confirm its want here or not if not so please remove 
-                $this->Type = env('DB_Type');
-                $this->Host = env('DB_Host');
-                $this->DB = env('DB_Name');
-                $this->User = env('DB_User');
-                $this->Password = env('DB_Password');// End - after add this please confirm its want here or not if not so please remove 
-                dd('subdomain env credencial');
-            }
-        } else {
-            $this->Type = env('DB_Type');
-            $this->Host = env('DB_Host');
-            $this->DB = env('DB_Name');
-            $this->User = env('DB_User');
-            $this->Password = env('DB_Password');
-            dd('subdomain env notmultytenancy credencial');
+        if (empty($Credential)) {
+            $Credential = Credential::DB();
         }
+        if (is_array($Credential) && !empty($Credential)) {
+            $this->Type = strtolower($Credential['DB_Type']);
+            $this->Host = $Credential['DB_Host'];
+            $this->DB = $Credential['DB_Name'];
+            $this->User = $Credential['DB_User'];
+            $this->Password = $Credential['DB_Password'];
+            $this->CredentialID = $Credential['ID'];
+        } else {
+            throw new SystemExc("Credential configuration is missing.");
+        }
+        $backtrace = debug_backtrace();
+        $this->connect($WantToCreateDB);
+    }
 
+    // Method to get the singleton instance
+    public static function getInstance(array $Credential = null, bool $WantToCreateDB = false)
+    {
+        if (self::$instance === null) {
+            self::$instance = new self($Credential, $WantToCreateDB);
+        }
+        return self::$instance;
+    }
 
-        dd('DBType ='.$this->Type);
-        if (($Type = trim(strtolower($this->Type))) == 'mysql') {
-            try {
-                //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
-                $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
-                $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                if (!empty($this->DB) && $this->CheckDBExisted($this->DB) == true) {
-                    $this->UseDB();
-                } else {
-                    if ($WantToCreateDB === true) {
-                        $this->CreateDB($this->DB); // Create the database if it does not exist
-                        $this->UseDB(); // Now select the newly created database
-                    }
-                }
-            } catch (PDOException $E) {
-                throw new DBExc($E->getMessage(), $E->getCode(), $E);
+    private function connect(bool $WantToCreateDB)
+    {
+        try {
+            // Check if a connection already exists in the pool
+            if (isset(self::$connectionPool[$this->CredentialID])) {
+                $this->Connection = self::$connectionPool[$this->CredentialID];
+                return;
             }
-        } else
-            throw new SystemExc("Unsupported database type: " . $this->Type);
+            // Create a new connection
+            $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+            $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Add the connection to the pool
+            self::$connectionPool[$this->CredentialID] = $this->Connection;
+
+            if (!empty($this->DB) && $this->checkDBExisted($this->DB)) {
+                $this->UseDB();
+            } elseif ($WantToCreateDB) {
+                $this->CreateDB($this->DB);
+                $this->UseDB();
+            }
+        } catch (PDOException $e) {
+            throw new DBExc($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    public function closeConnection()
+    {
+        if ($this->CredentialID !== null && isset(self::$connectionPool[$this->CredentialID])) {
+            unset(self::$connectionPool[$this->CredentialID]);
+            $this->Connection = null; // Clear the current connection
+        }
     }
 
     /**
@@ -94,9 +101,8 @@ class DB
     {
         try {
             $this->Connection->exec("USE `$this->DB`");
-        } catch (PDOException $E) {
-
-            throw new DBExc($E->getMessage(), $E->getCode(), $E);
+        } catch (PDOException $e) {
+            throw new DBExc($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -136,23 +142,28 @@ class DB
         // Initialize result as false
         $exists = false;
 
-        if (!empty($dbName)) {
+        // Define valid database name pattern
+        $validDbNamePattern = '/^[a-zA-Z0-9_]+$/';
+
+        // Check if the database name is valid and not empty
+        if (!empty($dbName) && preg_match($validDbNamePattern, $dbName)) {
             try {
                 // Prepare the SQL query to check for the existence of the database
-                $sql = "SHOW DATABASES LIKE ?";
+                $sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?";
                 $stmt = $this->Connection->prepare($sql);
                 $stmt->execute([$dbName]);
                 $exists = $stmt->rowCount() > 0; // Set exists to true if a database is found
-            } catch (PDOException $E) {
-                // Log the error or handle it as needed
-                // For example, log the error without throwing it to prevent stopping execution
-                throw new DBExc($E->getMessage(), $E->getCode(), $E);
-                //error_log("Error checking database existence: " . $e->getMessage());
+            } catch (PDOException $e) {
+                // Log the error
+                error_log("Error checking database existence: " . $e->getMessage());
+                // Optionally rethrow the exception if you want to handle it higher up
+                // throw $e;
             }
         }
 
         return $exists; // Return the result (true or false)
     }
+
 
 
 
@@ -584,6 +595,28 @@ class DB
         return $this->Connection->quote($value);
     }
 
+    // Prevent cloning of the instance
+    private function __clone()
+    {
+    }
+
+    // Prevent unserializing of the instance
+    public function __wakeup()
+    {
+        if (!$this->Connection) {
+            try {
+                //$this->Connection = new PDO("$Type:host=$this->Host;dbname=$this->DB", $this->User, $this->Password); // direct connect with DBname but need to dynamic time issue so now flexible of db other wise use this direct but framwor isntall setup is not working
+                $this->Connection = new PDO(strtolower($this->Type) . ":host=$this->Host", $this->User, $this->Password);
+                $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                if (!empty($this->DB) && $this->CheckDBExisted($this->DB)) {
+                    $this->UseDB();
+                }
+            } catch (PDOException $e) {
+                throw new DBExc($e->getMessage(), $e->getCode(), $e);
+            }
+        }
+    }
     public function __destruct()
     {
         /*         * /

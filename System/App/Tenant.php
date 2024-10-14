@@ -1,10 +1,13 @@
 <?php
 
 namespace System\App;
+
+use Credential;
 use System\Config\DB;
 use System\App\Tenant\SystemValidator;
 use System\App\Service\OwnerService;
 use System\App\Service\TenantService;
+use System\Middleware\SystemValidate;
 use System\Preload\SystemExc;
 
 class Tenant extends \System\App\Tenant\Base
@@ -43,25 +46,32 @@ class Tenant extends \System\App\Tenant\Base
     {
         // Initialize your DB instance
 
+        /*  * /
         $db = new DB();
         //dd($db->ListAll());
         $validator = new SystemValidator($db);
+        /* */
+
+
+        // Usage
 
 
         // Here you can run any setup code as needed
         // For example, setting up the owner and tenant
         try {
+
+            /* * /
             // Setup owner (example)
             $db = new DB();
             dd('now check owner are existed or create');
             $ownerService = new OwnerService($validator, $db);
-            $ownerService->ensureOwnerExists('Owner Name',env('OwnerSubDomain'));
+            $ownerService->ensureOwnerExists('Owner Name', env('OwnerSubDomain'));
             //echo "Owner setup completed successfully.\n";
-
+            /* */
             // Setup tenant (example)
             if (!empty(SubDomain()) && 1 == 2) {
                 $tenantService = new TenantService($validator, $db);
-                $tenantService->processTenant('Tenant1','user1');
+                $tenantService->processTenant('Tenant1', 'user1');
                 echo "Tenant setup completed successfully.\n";
             }
 
@@ -70,65 +80,73 @@ class Tenant extends \System\App\Tenant\Base
         }
     }
 
-    static function DetailsBySubDomain(string $SubDomain = '')
+    static function DetailsBySubDomain(string|null $SubDomain = '')
     {
         if (!empty($SubDomain)) {
-            if (!empty($T = Tenant::SelectOnes(['*'], ['SubDomain' => $SubDomain]))) {
+            if (!empty($T = Tenant::SelectOnes(['*'], self::IsOwner() ? ['ID' => 1] : ['SubDomain' => $SubDomain]))) {
                 //if (!empty($T = Tenant::Select([], 'SubDomain = "' . $SubDomain . '"'))) {
                 return $T;
             }
         }
     }
 
-    static function IsVerified(string $SubDomain = '')
+    static function Data(string $SubDomain = '')
+    {
+        global $TenantData;
+        if (isset($TenantData) && Tenant::IsTenant()) {
+            return $TenantData;
+        } elseif (!isset($TenantData) && Tenant::IsTenant()) {
+            $TenantData = Tenant::DetailsBySubDomain(SubDomain: $SubDomain ?: SubDomain());
+            return $TenantData;
+        } else {
+            return Tenant::DetailsBySubDomain(SubDomain: $SubDomain ?: SubDomain());
+        }
+    }
+
+    static function IsVerified(string $SubDomain = '', $Tenant = [])
     {
         try {
-            $Tenant = self::DetailsBySubDomain(($SubDomain ?: SubDomain()) ?: '');
+            $Tenant = !empty($Tenant) ? $Tenant : (Tenant::Data());
             if (!empty($Tenant)) {
                 if ($Tenant['Deleted'] != 1) {
                     if ($Tenant['Status'] == 1) {
                         if (!empty($Tenant['DB_Type']) && !empty($Tenant['DB_Host'])) {
                             if (!empty($Tenant['DB_Name']) && !empty($Tenant['DB_User'])) {
-                                if (is_dir(TenantBaseDir . $Tenant['ID'])) {
+                                if (is_dir($TenantBaseDir = TenantBaseDir . $Tenant['ID'])) {
                                     $_SERVER['Tenant']['ID'] = $Tenant['ID'];
                                     $_SERVER['Tenant']['Name'] = $Tenant['Name'];
                                     require_once Config . 'Tenant.php';
                                     return true;
                                 } else
-                                    throw new \SystemExc('This Tenant is not configure, Some Directory not found', 12);
+                                    throw new SystemExc('This Tenant is not configure, Some Directory not found ' . $TenantBaseDir, 12);
                             } else
-                                throw new \SystemExc('Need to configure Database credencial', 404);
+                                throw new SystemExc('Need to configure Database credencial', 404);
                         } else
-                            throw new \SystemExc('Need to configure Database', 404);
+                            throw new SystemExc('Need to configure Database', 404);
                     } else
-                        throw new \SystemExc('This user is inactive', 404);
+                        throw new SystemExc('This user is inactive', 404);
                 } else
-                    throw new \SystemExc('This user is no longer associated with the domain.', 404);
+                    throw new SystemExc('This user is no longer associated with the domain.', 404);
             } else
-                throw new \SystemExc('Invalid URL - Not found', 404);
-        } catch (\SystemExc $E) {
+                throw new SystemExc('Invalid URL - Not found', 404);
+        } catch (SystemExc $E) {
             $E->Response($E);
             //throw new Exc($E->getMessage(), $E->getCode(), $E);
             //Response($E->getCode(), $E->getMessage(), isset($D) ? $D : [], $E);
         }
     }
 
-    static function DBCredencial(string $SubDomain = '')
+    static function IsOwner()
     {
-        $Tenant = self::DetailsBySubDomain($SubDomain) ?: [];
-        return !empty($Tenant) ? [
-            'DB_Type' => $Tenant['DB_Type'] ?: '',
-            'DB_Host' => $Tenant['DB_Host'] ?: '',
-            'DB_Name' => $Tenant['DB_Name'] ?: '',
-            'DB_User' => $Tenant['DB_User'] ?: '',
-            'DB_Password' => $Tenant['DB_Password'] ?: '',
-        ] :
-            [
-                'DB_Type' => '',
-                'DB_Host' => '',
-                'DB_Name' => '',
-                'DB_User' => '',
-                'DB_Password' => '',
-            ];
+        return SubDomain() == env('OwnerSubDomain') ? true : false;
     }
+
+
+    static function IsTenant()
+    {
+        return !empty(SubDomain()) && self::IsOwner() != true ? true : false;
+    }
+
+
+
 }

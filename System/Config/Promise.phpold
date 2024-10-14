@@ -1,0 +1,61 @@
+<?php
+
+namespace System\Config;
+
+class Promise
+{
+    private $onResolve;
+    private $onReject;
+    private $resolved = false;
+    private $rejected = false;
+    private $value;
+    private $reason;
+
+    public function __construct(callable $executor)
+    {
+        $resolve = function ($value) {
+            $this->resolved = true;
+            $this->value = $value;
+            if ($this->onResolve) {
+                call_user_func($this->onResolve, $value);
+            }
+        };
+
+        $reject = function ($reason) {
+            $this->rejected = true;
+            $this->reason = $reason;
+            if ($this->onReject) {
+                call_user_func($this->onReject, $reason);
+            }
+        };
+
+        try {
+            $executor($resolve, $reject);
+        } catch (\Exception $e) {
+            $reject($e->getMessage());
+        }
+    }
+
+    public function then(callable $onResolve)
+    {
+        $this->onResolve = $onResolve;
+        if ($this->resolved) {
+            call_user_func($onResolve, $this->value);
+        }
+        return $this;
+    }
+
+    public function catch(callable $onReject)
+    {
+        $this->onReject = $onReject;
+        if ($this->rejected) {
+            call_user_func($onReject, $this->reason);
+        }
+        return $this;
+    }
+
+    public function wait()
+    {
+        // You can implement logic here if you want to block until the promise resolves or rejects.
+    }
+}

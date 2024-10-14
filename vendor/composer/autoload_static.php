@@ -39,6 +39,9 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
 
     public static $classMap = array (
         'App\\Controller\\AboutController' => __DIR__ . '/../..' . '/App/Controller/AboutController.php',
+        'App\\Controller\\ContactController' => __DIR__ . '/../..' . '/App/Controller/ContactController.php',
+        'App\\Controller\\HomeController' => __DIR__ . '/../..' . '/App/Controller/HomeController.php',
+        'App\\Controller\\IndexController' => __DIR__ . '/../..' . '/App/Controller/IndexController.php',
         'App\\Controller\\UserController' => __DIR__ . '/../..' . '/App/Controller/UserController.php',
         'App\\Model\\Contact' => __DIR__ . '/../..' . '/App/Model/Contact.php',
         'App\\Model\\User' => __DIR__ . '/../..' . '/App/Model/User.php',
@@ -59,15 +62,23 @@ class ComposerStaticInitef17410c5350abc31eed98708c174fc4
         'System\\App\\Session\\DBBased' => __DIR__ . '/../..' . '/System/App/Session/DBBased.php',
         'System\\App\\Tenant' => __DIR__ . '/../..' . '/System/App/Tenant.php',
         'System\\App\\Tenant\\Base' => __DIR__ . '/../..' . '/System/App/Tenant/Base.php',
+        'System\\App\\Tenant\\SystemValidator' => __DIR__ . '/../..' . '/System/App/Tenant/SystemValidator.php',
         'System\\App\\Trait\\UDFModel' => __DIR__ . '/../..' . '/System/App/Trait/UDFModel.php',
         'System\\App\\View' => __DIR__ . '/../..' . '/System/App/View.php',
+        'System\\Config\\Credential' => __DIR__ . '/../..' . '/System/Config/Credential.php',
         'System\\Config\\DB' => __DIR__ . '/../..' . '/System/Config/DB.php',
+        'System\\Config\\Promise' => __DIR__ . '/../..' . '/System/Config/Promise.php',
+        'System\\Config\\SystemValidate' => __DIR__ . '/../..' . '/System/Config/SystemValidate.php',
+        'System\\Config\\TenantValidate' => __DIR__ . '/../..' . '/System/Config/TenantValidate.php',
         'System\\Domain' => __DIR__ . '/../..' . '/System/Domain.php',
         'System\\Init' => __DIR__ . '/../..' . '/System/Init.php',
         'System\\Preload\\DBExc' => __DIR__ . '/../..' . '/System/Preload/DBExc.php',
         'System\\Preload\\Exc' => __DIR__ . '/../..' . '/System/Preload/Exc.php',
+        'System\\Preload\\Exceptions' => __DIR__ . '/../..' . '/System/Preload/Exceptions.php',
         'System\\Preload\\Precocious' => __DIR__ . '/../..' . '/System/Preload/Precocious.php',
+        'System\\Preload\\PromiseExc' => __DIR__ . '/../..' . '/System/Preload/PromiseExc.php',
         'System\\Preload\\SystemExc' => __DIR__ . '/../..' . '/System/Preload/SystemExc.php',
+        'System\\UnitTest\\DBUnitTest' => __DIR__ . '/../..' . '/System/UnitTest/DBUnitTest.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

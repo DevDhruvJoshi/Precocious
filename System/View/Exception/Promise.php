@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>DB Error - PDOException</title>
+        <title>Promise Exception</title>
         <!--    <link rel="stylesheet" href="style.css">-->
         <style>
             .error-container {
@@ -20,11 +20,10 @@
     </head>
     <body>
         <div class="error-container">
-            <h1>System Exception </h1>
+            <h1>Promise Exception </h1>
             <p><b>Message:</b> <?php echo $Message; ?></p>
             <p><b>Code:</b> <?php echo $Code; ?></p>
             <p><b>File@Line:</b> <?php echo $File . ':' . $Line; ?></p>
-            <pre><?php var_dump($Trace); ?></pre>
             <pre><?php var_dump($Trace); ?></pre>
             <h2>Full Data</h2>
             <pre><?php print_r($E); ?></pre>

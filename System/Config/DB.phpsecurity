@@ -34,7 +34,8 @@ class DB
                     $this->User = $User;
                     $this->Password = $Password;
                 } else if (!empty(SubDomain())) {
-                    $Tenant = Tenant::DBCredencial(SubDomain());
+                    //$Tenant = (Tenant::DBCredencial(SubDomain()));
+                $Tenant =Credential::TenantDB();
                     $this->Type = $Tenant['DB_Type'];
                     $this->Host = $Tenant['DB_Host'];
                     $this->DB = $Tenant['DB_Name'];

@@ -29,5 +29,8 @@
     "minimum-stability": "stable",
     "require": {
         "symfony/dotenv": "^7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
     }
 }

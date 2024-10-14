@@ -4,7 +4,7 @@ namespace System\Preload;
 
 use Exception;
 
-class SystemExc extends Exception {
+class PromiseExc extends Exception {
     private $parameters;
     public static $Code;
     public static $Message;
@@ -30,8 +30,7 @@ class SystemExc extends Exception {
         SystemView('Exception/System', [
             'Code' => self::$Code,
             'Message' => self::$Message,
-            'Trace' => self::$Trace,
-            'TraceString' => self::$TraceString,
+            'Trace' => self::$TraceString,
             'File' => self::$File,
             'Line' => self::$Line,
             'E' => $E,

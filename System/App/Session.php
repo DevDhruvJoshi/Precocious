@@ -55,4 +55,16 @@ class Session {
     private static function GenerateNewID() {
         return bin2hex(random_bytes(32));
     }
+
+    public static function TableSchema(): array
+    {
+        return [
+            'session_id varchar(32) NOT NULL',
+            'modified timestamp NOT NULL DEFAULT current_timestamp()',
+            'data blob DEFAULT NULL',
+            'IP varchar(100) DEFAULT NULL',
+            'Browser text DEFAULT NULL',
+            'PRIMARY KEY (session_id)'
+        ];
+    }
 }

@@ -33,7 +33,7 @@ function dd($V, $E = 0)
 
 function env(string $K)
 {
-    return isset($K) ? $_ENV[$K] : null;
+    return isset($K) ? (isset($_ENV[$K]) ? $_ENV[$K] : throw new SystemExc('not found '.$K .' in env file')) : null;
 }
 
 function FuncCallFrom()
@@ -308,26 +308,43 @@ function GlobalExceptionInit(Throwable $E)
     SaveErrorLogFile($E, get_class($E));
 }
 
-function SaveErrorLogFile($E, $EClassName = null)
-{
-    //error_log($Msg, E_ERROR, $ErrorFile, 2); // issue with SMTP is reuired
-    $Msg = ('TID-' . ((TraceID !== null) ? TraceID : '') . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] ' . $EClassName . '#' . $E->getCode() . ' -> ' . $E->getMessage()) . '||';
-    $ErrorFile = (TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/' . date('Y-m-d')) . '.log';
-    //is_dir($ErrorFile) ?: throw new SystemExc('ErrorLog Directory is not found');
-    echo is_dir($ErrorFile) ? 'dir available' : 'dir not available';
-    file_exists($ErrorFile) ? '' : touch($ErrorFile);
-    file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
+function SaveErrorLogFile($E, $EClassName = null) {
+    $traceID = defined('TraceID') ? TraceID : '';
+    $oldTraceID = defined('OldTraceID') ? OldTraceID : '';
+    $timestamp = date('Y-m-d H:i:s');
+    $msg = "TID-{$traceID} OTID-{$oldTraceID} [{$timestamp}] {$EClassName}#{$E->getCode()} -> {$E->getMessage()}||";
+
+    $errorDir = TenantBaseDir . $_SERVER['Tenant']['ID'] . '/ErrorLog/';
+    $errorFile = $errorDir . date('Y-m-d') . '.log';
+
+    // Ensure the directory exists
+    if (!is_dir($errorDir)) {
+        mkdir($errorDir, 0777, true);
+    }
+
+    // Write to the error log file
+    file_put_contents($errorFile, $msg . PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
-function SaveAccessLogFile($Browser)
-{
-    //error_log($Msg, E_ERROR, $ErrorFile, 2); // issue with SMTP is reuired
+function SaveAccessLogFile($Browser) {
+    $traceID = defined('TraceID') ? TraceID : '';
+    $oldTraceID = defined('OldTraceID') ? OldTraceID : '';
+    $timestamp = date('Y-m-d H:i:s');
+    
     $C = Client();
-    $Msg = ('TID-' . TraceID . ' OTID-' . OldTraceID . ' [' . date('Y-m-d H:i:s') . '] Req-' . $_SERVER['REQUEST_METHOD'] . ' URI ' . $_SERVER['REQUEST_URI'] . ' IP-' . $C['IP'] . ' ' . $C['Browser'] . '#' . $C['Version'] . ' ' . $C['Platform'] . '#' . $C['PlatformVersion'] . '-' . $C['Bitness']) . '||';
-    $ErrorFile = (TenantBaseDir . $_SERVER['Tenant']['ID'] . '/AccessLog/' . date('Y-m-d')) . '.log';
-    //is_dir($ErrorFile) ?: throw new SystemExc('AccessLog Directory is not found');
-    file_exists($ErrorFile) ?: touch($ErrorFile);
-    file_put_contents($ErrorFile, $Msg . PHP_EOL, FILE_APPEND);
+    $msg = "TID-{$traceID} OTID-{$oldTraceID} [{$timestamp}] Req-{$_SERVER['REQUEST_METHOD']} URI {$_SERVER['REQUEST_URI']} IP-{$C['IP']} {$C['Browser']}#{$C['Version']} {$C['Platform']}#{$C['PlatformVersion']}-{$C['Bitness']}||";
+    
+    $accessDir = TenantBaseDir . $_SERVER['Tenant']['ID'] . '/AccessLog/';
+    $accessFile = $accessDir . date('Y-m-d') . '.log';
+
+    // Ensure the directory exists
+    if (!is_dir($accessDir)) {
+        mkdir($accessDir, 0777, true);
+    }
+
+    // Write to the access log file
+    file_put_contents($accessFile, $msg . PHP_EOL, FILE_APPEND | LOCK_EX);
 }
+
 
 set_exception_handler('GlobalExceptionInit');
