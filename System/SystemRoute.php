@@ -9,7 +9,7 @@ Route::Get('/', function () {
     echo "This is the System route home";
 });
 
-Route::Get('/AddTenant', function () {
+Route::Get('/addtenant', function () {
     Tenant::AddNew('User' . rand(1, 9));
 });
 
