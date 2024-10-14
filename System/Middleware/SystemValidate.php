@@ -66,6 +66,7 @@ class SystemValidate
     }
     private function CheckCriticalSteps(): void
     {
+        $ThreadPool = new ThreadPool(5); // for example, max 5 concurrent tasks
         foreach (self::CRITICAL_STEPS as $step) {
             $methodName = 'CheckStep' . $step;
             if (method_exists($this, $methodName)) {
@@ -76,6 +77,7 @@ class SystemValidate
                 }
             }
         }
+        $ThreadPool->wait(); // Wait for all tasks to complete
     }
 
     private function CheckStep1(): void
@@ -111,7 +113,6 @@ class SystemValidate
     {
         $this->CheckDatabaseCredentials();
         $this->CheckDatabaseConnection();
-        $threadPool = new ThreadPool(5); // for example, max 5 concurrent tasks
 
         foreach (self::STEPS as $Step => $Description) {
             $MethodName = 'Step' . $Step;
@@ -124,7 +125,6 @@ class SystemValidate
                 }
             }
         }
-        $threadPool->wait(); // Wait for all tasks to complete
     }
 
     private function Step3(): bool
