@@ -1,66 +1,114 @@
 <?php
-
 namespace System\App;
 
 use System\Preload\SystemExc;
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 
 class View {
-
     protected $File = '';
     protected $FilePath = '';
     public $Content = '';
     protected $Data = [];
     protected $ReturnContent = false;
+    protected $Cache = []; // Internal cache
+    const ERROR_CODE = 1404;
+    protected $Twig;
+    protected $UseTwig; // Flag to enable/disable Twig
 
-    function __construct(string $File, array $Data = [], bool $ReturnContent = false, bool $IsForSytem = false) {
+    function __construct(string $File, array $Data = [], bool $ReturnContent = false, bool $IsForSystem = false, bool $UseTwig = true) {
+        $this->File = $this->PrepareFileName($File);
+        $this->Data = $Data;
+        $this->ReturnContent = $ReturnContent;
+        $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
+        $this->UseTwig = $UseTwig; // Set the flag
 
-        try {
-            sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
-            sdd(' call From-' . FuncCallFrom());
-            $this->File = !empty($File) ? (trim(trim(trim($File), '/'), '.php') . '.php' ) : throw new SystemExc('View are Not calling', 1404);
+        if (!$this->isFileValid($this->FilePath)) {
+            throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
+        }
 
-            is_dir(dirname($this->FilePath = (($IsForSytem == true ? System : (App) ) . 'View' . DS . $this->File))) ?: throw new SystemExc(('File path id invalid @ ' . $this->FilePath), 1404);
-            !file_exists($this->FilePath) ? throw new SystemExc(('View Not Found @ ' . $this->FilePath), 1404) : null;
-            $this->Data = $Data;
-            $this->ReturnContent = $ReturnContent;
-        } catch (SystemExc $E) {
-            $E->Response($E);
-            //Response($E->getCode(), $E->getMessage(), isset($D) ? $D : [], $E);
-            //throw new SystemExc($E->getMessage() ?: 'View Class - Msg not defined', $E->getCode(), $E);
-        } finally {
-            sdd('finaly run View');
+        if ($this->UseTwig) {
+            $this->initializeTwig();
         }
     }
 
-    /**
-     * Safely escape/encode the provided data.
-     */
-    public function HTML($Data) {
-        sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
-        sdd(' call From-' . FuncCallFrom());
-        return htmlentities(((string) $Data));
-        return; //htmlentities(htmlspecialchars((string) $Data, ENT_QUOTES, 'UTF-8'));
+    private function initializeTwig() {
+        $loader = new FilesystemLoader(dirname($this->FilePath));
+        $this->Twig = new Environment($loader, [
+            'cache' => false, // Set to true for production
+            'debug' => true,  // Enable for development
+        ]);
     }
 
-    function Render() {
+    private function isFileValid(string $FilePath): bool {
+        return file_exists($FilePath);
+    }
+
+    private function PrepareFileName(string $File): string {
+        if (empty($File)) {
+            throw new SystemExc('View not calling', self::ERROR_CODE);
+        }
+        return trim(trim(trim($File), '/'), '.php') . ($this->UseTwig ? '.twig' : '.php'); // Conditional extension
+    }
+
+    private function GetFilePath(string $File, bool $IsForSystem): string {
+        $BasePath = $IsForSystem ? System : App;
+        return $BasePath . 'View' . DS . $File;
+    }
+
+    public function HTML($Data): string {
+        return is_array($Data) ? array_map([$this, 'HTML'], $Data) : htmlentities((string)$Data);
+    }
+
+    public function Render(): string {
         return html_entity_decode($this->Content());
     }
 
-    function Content() {
-        sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
-        sdd(' call From-' . FuncCallFrom());
-        if (file_exists($this->FilePath)) {
-            extract($this->Data);
-            ob_start();
-            include $this->FilePath;
-            $this->Content = $this->ReturnContent == true ? $this->HTML(ob_get_contents()) : ob_get_contents();
-            ob_end_clean();
+    public function Content(): string {
+        $CacheKey = 'view_' . md5($this->FilePath);
+
+        // Check if cached content exists and validate it
+        if (isset($this->Cache[$CacheKey])) {
+            if (filemtime($this->FilePath) > $this->Cache[$CacheKey]['time']) {
+                unset($this->Cache[$CacheKey]); // Invalidate cache
+            } else {
+                return $this->Cache[$CacheKey]['content'];
+            }
         }
-        return $this->Content;
+
+        try {
+            if ($this->isFileValid($this->FilePath)) {
+                if ($this->UseTwig) {
+                    // Render the Twig template
+                    $Output = $this->Twig->render(basename($this->FilePath), $this->Data);
+                } else {
+                    // Include the PHP file directly
+                    ob_start();
+                    include $this->FilePath; // Passing $this->Data explicitly if needed
+                    $Output = ob_get_clean();
+                }
+
+                // Cache the output with the current file modification time
+                $this->Cache[$CacheKey] = [
+                    'content' => $this->ReturnContent ? $this->HTML($Output) : $Output,
+                    'time' => filemtime($this->FilePath)
+                ];
+
+                return $this->Cache[$CacheKey]['content'];
+            }
+            throw new SystemExc('File does not exist at path: ' . $this->FilePath, self::ERROR_CODE);
+        } catch (SystemExc $E) {
+            $this->HandleError($E);
+            return ''; // Return empty content if an error occurs
+        }
+    }
+
+    private function HandleError(SystemExc $E) {
+        error_log($E->getMessage());
+        $E->Response($E);
     }
 
     function __destruct() {
-        sdd(' call ' . __CLASS__ . '@' . __FUNCTION__ . ' Line @' . __LINE__);
-        sdd(' call From-' . FuncCallFrom());
+        // Optional: Clean-up code if needed
     }
 }

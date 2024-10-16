@@ -28,7 +28,8 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "symfony/dotenv": "^7.1"
+        "symfony/dotenv": "^7.1",
+        "twig/twig": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

@@ -1,8 +1,7 @@
 <?php
-
 namespace System\Concurrency;
 
-use Exception;
+use System\Preload\SystemExc;
 
 class ThreadPool
 {
@@ -17,7 +16,7 @@ class ThreadPool
     public function submit(callable $task): void
     {
         if (count($this->workers) >= $this->maxWorkers) {
-            throw new Exception("Maximum worker limit reached.");
+            throw new SystemExc(__CLASS__ . " - Maximum worker limit reached.");
         }
 
         $this->workers[] = new Worker($task);
@@ -34,7 +33,7 @@ class ThreadPool
 
 class Worker
 {
-    private $task; // Changed from callable to mixed
+    private $task;
     private $process;
 
     public function __construct(callable $task)
@@ -44,9 +43,8 @@ class Worker
 
     public function start(): void
     {
-        // Use closure serialization if the task is callable
-        $taskString = serialize($this->task);
-        $this->process = popen('php -r ' . escapeshellarg("unserialize(" . var_export($taskString, true) . ");"), 'r');
+        // Use the task as a callable reference
+        $this->process = popen('php -r ' . escapeshellarg('call_user_func(' . get_class($this->task[0]) . '::' . $this->task[1] . ');'), 'r');
     }
 
     public function join(): void

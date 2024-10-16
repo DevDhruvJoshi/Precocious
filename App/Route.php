@@ -1,5 +1,5 @@
 <?php
-
+/* * /
 use System\App\Route;
 use System\Preload\Precocious;
 use App\Model\Contact;
@@ -16,10 +16,12 @@ Route::Get('/phpinfo', function () {
 Route::Get('/install', function () {
     Precocious::Install();
 });
-
+/* */
+/* * /
 Route::Get('/dbunittest', function () {
     $db = new \System\Config\DB();
-/* * /
+
+
     dd('start - user insert');
     $userId = $db->Insert('users', [
         'name' => 'John Doe',
@@ -60,11 +62,12 @@ Route::Get('/dbunittest', function () {
     dd('select User by query() id =5 $result');
     $result = $db->Fetch($db->Query('SELECT * FROM users WHERE id = ? or username=?', [5, 'test']));
     dd($result);
-/* */
-     //return SystemView('Exception/DB',[ ],$Content = false);
+    return SystemView('Exception/DB',[ ],$Content = false);
     $result = $db->Fetch($db->Query('SELECT * FROM userss WHERE id = ? or username=?', [5, 'test']));
 });
+/* */
 
+/* * /
 Route::Get('/about', function () {
     echo "This is the about Route";
 
@@ -109,3 +112,4 @@ Route::Post('/users', function () {
     ];
     return json_encode($users);
 });
+/* */

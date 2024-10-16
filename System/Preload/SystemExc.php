@@ -26,7 +26,7 @@ class SystemExc extends Exception {
     }
 
     public function Response($E) {
-        //error_log($logMessage); // Example using error log
+        //error_log(self::$Message); // Example using error log
         SystemView('Exception/System', [
             'Code' => self::$Code,
             'Message' => self::$Message,

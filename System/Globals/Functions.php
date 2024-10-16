@@ -347,4 +347,5 @@ function SaveAccessLogFile($Browser) {
 }
 
 
+
 set_exception_handler('GlobalExceptionInit');

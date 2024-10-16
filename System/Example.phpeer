@@ -1,0 +1,120 @@
+
+Route::Group(['prefix' => 'resource'], function () {
+    //Route::Get('/', function () { });
+    //Route::Post('/', function () { );
+    //Route::Put('/{id}', function ($id) { });
+    //Route::Delete('/{id}', function ($id) { });
+});
+
+// Adding a new tenant dynamically
+Route::Get('/addtenant', function () {
+    $tenantName = 'User' . rand(1, 9);
+    Tenant::AddNew($tenantName);
+    echo "Tenant $tenantName added.";
+});
+
+// Installation route
+Route::Get('/install', function () {
+    Precocious::Install();
+});
+
+// Error handling for dynamic routes
+Route::Get('/users/{id}', function ($id) {
+    $user = UserController::find($id); // Assuming a method to find user
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(['error' => 'User not found']);
+    } else {
+        echo json_encode($user);
+    }
+});
+/* */
+
+
+/* Route all Examples*/
+// Assuming the Route class is already included or autoloaded
+
+// 1. Basic Route Registration
+Route::Get('/home', function () {
+    return "Welcome to the Home Page!";
+});
+
+// 2. Route with Parameters
+Route::Get('/user/{id}', function ($Id) {
+    return "User ID: $Id";
+});
+
+// 3. Grouping Routes with Prefix
+Route::Prefix('admin', function () {
+    Route::Get('/dashboard', function () {
+        return "Admin Dashboard";
+    });
+
+    Route::Get('/settings', function () {
+        return "Admin Settings";
+    });
+});
+
+// 4. Middleware Registration
+Route::Middleware(function ($RoutePath) {
+    // Example middleware logic
+    if (!isLoggedIn()) {
+        throw new SystemExc("Unauthorized access!");
+    }
+});
+
+// 5. Using Middleware with Routes
+Route::Get('/profile', function () {
+    return "User Profile";
+})->Middleware([UserAuthMiddleware::class, 'check']);
+
+// 6. Redirecting Routes
+Route::Redirect('/old-path', '/new-path');
+
+// 7. Permanent Redirect
+Route::PermanentRedirect('/old-home', '/new-home');
+
+// 8. View Rendering
+Route::View('/about', 'aboutView', ['title' => 'About Us']);
+
+// 9. Handling Different HTTP Methods
+Route::Post('/submit', function () {
+    return "Form Submitted!";
+});
+
+Route::Put('/update', function () {
+    return "Data Updated!";
+});
+
+Route::Delete('/remove', function () {
+    return "Data Removed!";
+});
+
+// 10. Catch-All Route
+Route::Any('/fallback', function () {
+    return "No route matched!";
+});
+
+// 11. Domain Routing
+Route::Domain('{account}.example.com', function () {
+    Route::Get('/', function () {
+        return "Welcome to your account!";
+    });
+});
+
+// 14. Clearing Routes Cache
+Route::ClearRoutesCache();
+
+// 15. Handling Different Route Scenarios
+Route::Any('/contact', function () {
+    return "Contact Page";
+});
+
+// 16. Combining Routes with Parameters and Middleware
+Route::Middleware([AuthMiddleware::class, 'check']);
+
+Route::Get('/dashboard/{userId}', function ($UserId) {
+    return "Dashboard for User ID: $UserId";
+});
+
+

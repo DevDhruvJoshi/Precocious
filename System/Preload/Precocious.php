@@ -2,6 +2,8 @@
 
 namespace System\Preload;
 
+use App\Middleware\Middleware;
+use System\App\Route;
 use System\Preload\SystemExc;
 use System\App\Tenant;
 use System\App\Session;
@@ -108,30 +110,38 @@ class Precocious
         }
     }
 
+
+    // Define middleware as named functions outside of the main function
+
     function DynamicRouteSystem()
     {
         try {
 
-            require System . 'SystemRoute.php'; // Core system routes
+            
+            //Route::ClearRoutesCache(); 
+            Route::LoadRoutesFromCache();
 
-            // Middleware to check permissions and subdomains
+            require System . 'SystemRoute.php'; // Load core system routes
+
             if (Tenant::Permission()) {
                 $subDomain = SubDomain();
-
                 if (!empty(env('OwnerSubDomain')) && $subDomain === env('OwnerSubDomain')) {
                     require App . 'OwnerRoute.php'; // Owner-specific routes
                 } elseif (!empty($subDomain)) {
                     require App . 'TenantRoute.php'; // Tenant-specific routes
                 } else {
-                    require App . 'Route.php'; // Default routes for unspecified subdomains
+                    require App . 'Route.php'; // Default routes
                 }
             } else {
                 require App . 'Route.php'; // Default routes for unauthorized access
             }
-            //System\App\Route::Dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
-            \System\App\Route::Dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+            Route::SaveRoutesToCache(); // Save routes after registration
+            Route::Dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']); // Handle the request
         } catch (SystemExc $E) {
-            $E->Response($E);
+            $E->Response($E); // Handle exceptions
         }
     }
+
+
+
 }
