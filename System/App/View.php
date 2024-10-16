@@ -12,7 +12,7 @@ class View {
     protected $Data = [];
     protected $ReturnContent = false;
     protected $Cache = []; // Internal cache
-    const ERROR_CODE = 1404;
+    const ERROR_CODE_NOT_FOUND = 1404;
     protected $Twig;
     protected $UseTwig; // Flag to enable/disable Twig
 
@@ -23,30 +23,30 @@ class View {
         $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
         $this->UseTwig = $UseTwig; // Set the flag
 
-        if (!$this->isFileValid($this->FilePath)) {
-            throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
+        if (!$this->IsFileValid($this->FilePath)) {
+            throw new SystemExc('The specified view file could not be found at: ' . $this->FilePath, self::ERROR_CODE_NOT_FOUND);
         }
 
         if ($this->UseTwig) {
-            $this->initializeTwig();
+            $this->InitializeTwig();
         }
     }
 
-    private function initializeTwig() {
-        $loader = new FilesystemLoader(dirname($this->FilePath));
-        $this->Twig = new Environment($loader, [
+    private function InitializeTwig() {
+        $Loader = new FilesystemLoader(dirname($this->FilePath));
+        $this->Twig = new Environment($Loader, [
             'cache' => false, // Set to true for production
             'debug' => true,  // Enable for development
         ]);
     }
 
-    private function isFileValid(string $FilePath): bool {
+    private function IsFileValid(string $FilePath): bool {
         return file_exists($FilePath);
     }
 
     private function PrepareFileName(string $File): string {
         if (empty($File)) {
-            throw new SystemExc('View not calling', self::ERROR_CODE);
+            throw new SystemExc('View file name must not be empty.', self::ERROR_CODE_NOT_FOUND);
         }
         return trim(trim(trim($File), '/'), '.php') . ($this->UseTwig ? '.twig' : '.php'); // Conditional extension
     }
@@ -56,8 +56,8 @@ class View {
         return $BasePath . 'View' . DS . $File;
     }
 
-    public function HTML($Data): string {
-        return is_array($Data) ? array_map([$this, 'HTML'], $Data) : htmlentities((string)$Data);
+    public function Html($Data): string {
+        return is_array($Data) ? array_map([$this, 'Html'], $Data) : htmlentities((string)$Data);
     }
 
     public function Render(): string {
@@ -77,26 +77,32 @@ class View {
         }
 
         try {
-            if ($this->isFileValid($this->FilePath)) {
+            if ($this->IsFileValid($this->FilePath)) {
                 if ($this->UseTwig) {
                     // Render the Twig template
-                    $Output = $this->Twig->render(basename($this->FilePath), $this->Data);
+                    try {
+                        $Output = $this->Twig->render(basename($this->FilePath), $this->Data);
+                    } catch (\Twig\Error\Error $e) {
+                        error_log('Twig Error: ' . $e->getMessage());
+                        return ''; // Return empty content if an error occurs
+                    }
                 } else {
                     // Include the PHP file directly
                     ob_start();
+                    extract($this->Data);
                     include $this->FilePath; // Passing $this->Data explicitly if needed
                     $Output = ob_get_clean();
                 }
 
                 // Cache the output with the current file modification time
                 $this->Cache[$CacheKey] = [
-                    'content' => $this->ReturnContent ? $this->HTML($Output) : $Output,
+                    'content' => $this->ReturnContent ? $this->Html($Output) : $Output,
                     'time' => filemtime($this->FilePath)
                 ];
 
                 return $this->Cache[$CacheKey]['content'];
             }
-            throw new SystemExc('File does not exist at path: ' . $this->FilePath, self::ERROR_CODE);
+            throw new SystemExc('The specified view file does not exist at path: ' . $this->FilePath, self::ERROR_CODE_NOT_FOUND);
         } catch (SystemExc $E) {
             $this->HandleError($E);
             return ''; // Return empty content if an error occurs

@@ -2,6 +2,8 @@
 namespace System\App;
 
 use System\Preload\SystemExc;
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 
 class View {
     protected $File = '';
@@ -11,21 +13,31 @@ class View {
     protected $ReturnContent = false;
     protected $Cache = []; // Internal cache
     const ERROR_CODE = 1404;
+    protected $Twig;
+    protected $UseTwig; // Flag to enable/disable Twig
 
-    function __construct(string $File, array $Data = [], bool $ReturnContent = false, bool $IsForSystem = false) {
-        try {
-            $this->File = $this->PrepareFileName($File);
-            $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
+    function __construct(string $File, array $Data = [], bool $ReturnContent = false, bool $IsForSystem = false, bool $UseTwig = true) {
+        $this->File = $this->PrepareFileName($File);
+        $this->Data = $Data;
+        $this->ReturnContent = $ReturnContent;
+        $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
+        $this->UseTwig = false;//$UseTwig; // Set the flag
 
-            if (!$this->isFileValid($this->FilePath)) {
-                throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
-            }
-
-            $this->Data = $Data;
-            $this->ReturnContent = $ReturnContent;
-        } catch (SystemExc $E) {
-            $this->HandleError($E);
+        if (!$this->isFileValid($this->FilePath)) {
+            throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
         }
+
+        if ($this->UseTwig) {
+            $this->initializeTwig();
+        }
+    }
+
+    private function initializeTwig() {
+        $loader = new FilesystemLoader(dirname($this->FilePath));
+        $this->Twig = new Environment($loader, [
+            'cache' => false, // Set to true for production
+            'debug' => true,  // Enable for development
+        ]);
     }
 
     private function isFileValid(string $FilePath): bool {
@@ -33,7 +45,10 @@ class View {
     }
 
     private function PrepareFileName(string $File): string {
-        return !empty($File) ? trim(trim(trim($File), '/'), '.php') . '.php' : throw new SystemExc('View not calling', self::ERROR_CODE);
+        if (empty($File)) {
+            throw new SystemExc('View not calling', self::ERROR_CODE);
+        }
+        return trim(trim(trim($File), '/'), '.php') . ($this->UseTwig ? '.twig' : '.php'); // Conditional extension
     }
 
     private function GetFilePath(string $File, bool $IsForSystem): string {
@@ -51,29 +66,40 @@ class View {
 
     public function Content(): string {
         $CacheKey = 'view_' . md5($this->FilePath);
-    
+
         // Check if cached content exists and validate it
         if (isset($this->Cache[$CacheKey])) {
-            // Check if the file has been modified since caching
             if (filemtime($this->FilePath) > $this->Cache[$CacheKey]['time']) {
-                unset($this->Cache[$CacheKey]);
+                unset($this->Cache[$CacheKey]); // Invalidate cache
             } else {
                 return $this->Cache[$CacheKey]['content'];
             }
         }
-    
+
         try {
             if ($this->isFileValid($this->FilePath)) {
-                ob_start();
-                include $this->FilePath; // Avoid variable collisions by passing data explicitly
-                $Output = ob_get_clean();
-    
+                if ($this->UseTwig) {
+                    // Render the Twig template
+                    try {
+                        $Output = $this->Twig->render(basename($this->FilePath), $this->Data);
+                    } catch (\Twig\Error\Error $e) {
+                        error_log('Twig Error: ' . $e->getMessage());
+                        return ''; // Return empty content if an error occurs
+                    }
+                } else {
+                    // Include the PHP file directly
+                    ob_start();
+                    extract($this->Data);
+                    include $this->FilePath; // Passing $this->Data explicitly if needed
+                    $Output = ob_get_clean();
+                }
+
                 // Cache the output with the current file modification time
                 $this->Cache[$CacheKey] = [
                     'content' => $this->ReturnContent ? $this->HTML($Output) : $Output,
                     'time' => filemtime($this->FilePath)
                 ];
-    
+
                 return $this->Cache[$CacheKey]['content'];
             }
             throw new SystemExc('File does not exist at path: ' . $this->FilePath, self::ERROR_CODE);
@@ -82,10 +108,9 @@ class View {
             return ''; // Return empty content if an error occurs
         }
     }
-    
 
     private function HandleError(SystemExc $E) {
-        // Log the error or perform any necessary cleanup
+        error_log($E->getMessage());
         $E->Response($E);
     }
 
