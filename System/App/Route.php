@@ -360,7 +360,7 @@ final class Route
                 }
             }
 
-            $Result = file_put_contents(Root.'routes.cache', serialize($CacheableRoutes));
+            $Result = file_put_contents(Root.'Cache/routes.cache', serialize($CacheableRoutes));
             if ($Result === false) {
                 throw new SystemExc("Failed to write to the routes cache file.");
             }
