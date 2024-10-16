@@ -102,6 +102,10 @@ class View
                     ob_start();
                     extract($this->Data);
                     include $this->FilePath; // Passing $this->Data explicitly if needed
+                    var_dump($CacheKey);
+                    var_dump($this->Data);
+                    var_dump( isset($this->Cache[$CacheKey]) ? $this->Cache[$CacheKey]['content'] : 'Error: Unable to render the view. Please try again later.');
+
                     $Output = ob_get_clean();
                 }
     
