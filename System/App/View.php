@@ -77,7 +77,7 @@ class View
     public function Content(): string
     {
         $CacheKey = 'view_' . md5($this->FilePath);
-
+    
         // Check if cached content exists and validate it
         if (isset($this->Cache[$CacheKey])) {
             if (filemtime($this->FilePath) > $this->Cache[$CacheKey]['time']) {
@@ -86,39 +86,41 @@ class View
                 return $this->Cache[$CacheKey]['content'];
             }
         }
-
+    
+        // Try to render the content
         try {
             if ($this->IsFileValid($this->FilePath)) {
                 if ($this->UseTwig) {
-                    // Render the Twig template
                     try {
+                        // Render the Twig template
                         $Output = $this->Twig->render(basename($this->FilePath), $this->Data);
                     } catch (\Twig\Error\Error $e) {
                         error_log('Twig Rendering Error: ' . $e->getMessage());
-                        return ''; // Return empty content if an error occurs
+                        $Output = ''; // Set empty if an error occurs
                     }
                 } else {
-                    // Include the PHP file directly
                     ob_start();
                     extract($this->Data);
                     include $this->FilePath; // Passing $this->Data explicitly if needed
                     $Output = ob_get_clean();
                 }
-
+    
                 // Cache the output with the current file modification time
                 $this->Cache[$CacheKey] = [
                     'content' => $this->ReturnContent ? $this->Html($Output) : $Output,
                     'time' => filemtime($this->FilePath)
                 ];
-
+    
                 return $this->Cache[$CacheKey]['content'];
             }
             throw new SystemExc('File Not Found: The view file does not exist at the path: ' . $this->FilePath . '. Please verify the path and try again.', self::ERROR_CODE);
         } catch (SystemExc $E) {
             $this->HandleError($E);
-            return ''; // Return empty content if an error occurs
+            // If there's an error, render the cached content if available, else return a default error message
+            var_dump( isset($this->Cache[$CacheKey]) ? $this->Cache[$CacheKey]['content'] : 'Error: Unable to render the view. Please try again later.');
         }
     }
+    
 
     private function HandleError(SystemExc $E)
     {
