@@ -12,7 +12,7 @@ class View {
     protected $Data = [];
     protected $ReturnContent = false;
     protected $Cache = []; // Internal cache
-    const ERROR_CODE_NOT_FOUND = 1404;
+    const ERROR_CODE = 1404;
     protected $Twig;
     protected $UseTwig; // Flag to enable/disable Twig
 
@@ -21,32 +21,32 @@ class View {
         $this->Data = $Data;
         $this->ReturnContent = $ReturnContent;
         $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
-        $this->UseTwig = $UseTwig; // Set the flag
+        $this->UseTwig = false;//$UseTwig; // Set the flag
 
-        if (!$this->IsFileValid($this->FilePath)) {
-            throw new SystemExc('The specified view file could not be found at: ' . $this->FilePath, self::ERROR_CODE_NOT_FOUND);
+        if (!$this->isFileValid($this->FilePath)) {
+            throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
         }
 
         if ($this->UseTwig) {
-            $this->InitializeTwig();
+            $this->initializeTwig();
         }
     }
 
-    private function InitializeTwig() {
-        $Loader = new FilesystemLoader(dirname($this->FilePath));
-        $this->Twig = new Environment($Loader, [
+    private function initializeTwig() {
+        $loader = new FilesystemLoader(dirname($this->FilePath));
+        $this->Twig = new Environment($loader, [
             'cache' => false, // Set to true for production
             'debug' => true,  // Enable for development
         ]);
     }
 
-    private function IsFileValid(string $FilePath): bool {
+    private function isFileValid(string $FilePath): bool {
         return file_exists($FilePath);
     }
 
     private function PrepareFileName(string $File): string {
         if (empty($File)) {
-            throw new SystemExc('View file name must not be empty.', self::ERROR_CODE_NOT_FOUND);
+            throw new SystemExc('View not calling', self::ERROR_CODE);
         }
         return trim(trim(trim($File), '/'), '.php') . ($this->UseTwig ? '.twig' : '.php'); // Conditional extension
     }
@@ -56,8 +56,8 @@ class View {
         return $BasePath . 'View' . DS . $File;
     }
 
-    public function Html($Data): string {
-        return is_array($Data) ? array_map([$this, 'Html'], $Data) : htmlentities((string)$Data);
+    public function HTML($Data): string {
+        return is_array($Data) ? array_map([$this, 'HTML'], $Data) : htmlentities((string)$Data);
     }
 
     public function Render(): string {
@@ -77,7 +77,7 @@ class View {
         }
 
         try {
-            if ($this->IsFileValid($this->FilePath)) {
+            if ($this->isFileValid($this->FilePath)) {
                 if ($this->UseTwig) {
                     // Render the Twig template
                     try {
@@ -96,13 +96,13 @@ class View {
 
                 // Cache the output with the current file modification time
                 $this->Cache[$CacheKey] = [
-                    'content' => $this->ReturnContent ? $this->Html($Output) : $Output,
+                    'content' => $this->ReturnContent ? $this->HTML($Output) : $Output,
                     'time' => filemtime($this->FilePath)
                 ];
 
                 return $this->Cache[$CacheKey]['content'];
             }
-            throw new SystemExc('The specified view file does not exist at path: ' . $this->FilePath, self::ERROR_CODE_NOT_FOUND);
+            throw new SystemExc('File does not exist at path: ' . $this->FilePath, self::ERROR_CODE);
         } catch (SystemExc $E) {
             $this->HandleError($E);
             return ''; // Return empty content if an error occurs
