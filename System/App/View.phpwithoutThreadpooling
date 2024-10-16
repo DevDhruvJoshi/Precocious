@@ -21,26 +21,26 @@ class View {
         $this->Data = $Data;
         $this->ReturnContent = $ReturnContent;
         $this->FilePath = $this->GetFilePath($this->File, $IsForSystem);
-        $this->UseTwig = false;//$UseTwig; // Set the flag
+        $this->UseTwig = false; //$UseTwig; // Set the flag
 
-        if (!$this->isFileValid($this->FilePath)) {
+        if (!$this->IsFileValid($this->FilePath)) {
             throw new SystemExc('View Not Found @ ' . $this->FilePath, self::ERROR_CODE);
         }
 
         if ($this->UseTwig) {
-            $this->initializeTwig();
+            $this->InitializeTwig();
         }
     }
 
-    private function initializeTwig() {
-        $loader = new FilesystemLoader(dirname($this->FilePath));
-        $this->Twig = new Environment($loader, [
+    private function InitializeTwig() {
+        $Loader = new FilesystemLoader(dirname($this->FilePath));
+        $this->Twig = new Environment($Loader, [
             'cache' => false, // Set to true for production
             'debug' => true,  // Enable for development
         ]);
     }
 
-    private function isFileValid(string $FilePath): bool {
+    private function IsFileValid(string $FilePath): bool {
         return file_exists($FilePath);
     }
 
@@ -56,8 +56,8 @@ class View {
         return $BasePath . 'View' . DS . $File;
     }
 
-    public function HTML($Data): string {
-        return is_array($Data) ? array_map([$this, 'HTML'], $Data) : htmlentities((string)$Data);
+    public function Html($Data): string {
+        return is_array($Data) ? array_map([$this, 'Html'], $Data) : htmlentities((string)$Data);
     }
 
     public function Render(): string {
@@ -77,7 +77,7 @@ class View {
         }
 
         try {
-            if ($this->isFileValid($this->FilePath)) {
+            if ($this->IsFileValid($this->FilePath)) {
                 if ($this->UseTwig) {
                     // Render the Twig template
                     try {
@@ -96,7 +96,7 @@ class View {
 
                 // Cache the output with the current file modification time
                 $this->Cache[$CacheKey] = [
-                    'content' => $this->ReturnContent ? $this->HTML($Output) : $Output,
+                    'content' => $this->ReturnContent ? $this->Html($Output) : $Output,
                     'time' => filemtime($this->FilePath)
                 ];
 
